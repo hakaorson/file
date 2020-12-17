@@ -211,8 +211,9 @@
   breaklinks=true,
   colorlinks=false,
   plainpages=false,
-  pdfpagelabels, %将\thepage写入pdf，使得阅读器可以显示‘ii (4 of 40)’ rather than simply ‘4 of 40’. 貌似不设这个选项也行？
-  pdfborder=0 0 0}
+  %pdfpagelabels %将\thepage写入pdf，使得阅读器可以显示‘ii (4 of 40)’ rather than simply ‘4 of 40’. 貌似不设这个选项也行？
+  % pdfborder=0 0 0
+  }
 % 设置 url 样式，与上下文一致
 \urlstyle{same}
 
@@ -227,8 +228,8 @@
 	nomarginpar,%即\marginparwidth=0pt and \marginparsep=0pt
 	left=31.7mm,%注意left=right
 	headheight=5mm,
-	headsep=5.4mm,	%页眉距顶端要求2cm。即25.4-20=5.4
-	footskip=5.4mm}	%\footskip指的是baseline of last line of text andbaseline of footer的距离
+	headsep=5.5mm,	%页眉距顶端要求2cm。即25.4-20=5.4
+	footskip=5.5mm}	%\footskip指的是baseline of last line of text andbaseline of footer的距离
 
 % 利用 \pkg{fancyhdr} 设置页眉页脚
 \RequirePackage{fancyhdr}

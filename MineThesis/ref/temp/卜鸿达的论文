@@ -1,0 +1,25 @@
+ oust T, Yu H, Pac   naro   A. Detecting   interaction networks. Nature Methods, 2012, 9(5): 471-472   [96] Nepi
+ 197] Christian V M. Roland K, Berend S, et al. Comparative assessment of large-scale data sets  99-403
+ of   protein-protein interactions. Nature, 2002, 417(6887): 3   [98] Altaf-Ul-Amin M, Shinbo Y, Mihara K, et al. Development and implementation of an algo   rithm for detection of protein complexes in large interaction networks. BMC Bioinformatics.
+2006,7(1):207.
+ 199)Chua H N, Ning K, Sung W K, et al. e   ndirect protein-protein interactions for
+ protein complex prediction   Journal of Biol   informatics and Computational Biology, 2008
+6(03):435-466   [1001 Chua H N, Sung W K, Wong L Exploiting indirect neighbours and topological weight to pre   dict protein function from protein-protein interactions. Bioinformatics, 2006, 22(13): 1623
+
+1630.
+ [IO1 Tomita E, Tanaka A, Takahashi H. The worst-case time complexity for generating   I maximal cliques and computational experiments. Theoretical Computer Science, 2006
+363(1):28-42
+ l102) Liu G, Wong L, Chua H N Complex discovery from weighted PPI networks. Bioinformatics,
+2009,25(15):1891-1897
+ [103 Friedel C C, Krumsiek J], Zimmer R. Bootstrapping the interactome: unsupervised identifi-
+ cation of protein complexes in yeast. Proceedings of Research in Computational Molecular
+ Biology. Springer, 2008. 3-16
+ 1104] Gavin A C, Aloy P, Grandi P, et al. Proteome survey reveals modularity of the yeast cell
+ machinery. Nature,2006,440(7084):631-636
+ [105] Komurov K, White M. Revealing static and dynamic modular architecture of the eukaryotic
+ protein Interaction network. Molecular Systems Biology, 2007, 3(1): 110
+ [106] Feng J, Jiang R, Jiang T. A max-flow-based approach to the identification of protein com-
+ plexes using protein interaction and microarray data. IEEE/ACM Transactions on Compu-   tational Biology and Bioinformatics(TCBB), 2011, 8(3): 621-634
+ [107] Gallo G. Grigoradis M D, Tarjan R E. A fast parametric maximum flow algorithm and
+ applications. SIAM Je   ournal on Computin  g,1989,18(1):30-55
+ [108 Maraziotis I A, Dimitrakopoulou K, Bezerianos A. Growing functional modules from a seed   protein via integration of protein interaction and gene expression data. BMC Bioinformatics  2007,8(1):1.

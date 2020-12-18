@@ -1,0 +1,84 @@
+1：蛋白质化学与蛋白质组学
+(2) Rigaut G, Shevchenko A, Rutz B, et al. A generic protein purification method for protein   complex characterization and proteome exploration. Nature Biotechnology, 1999, 17(10)
+
+1030-1032   (3) Bartel P L, Fields S. The yeast two-hybrid system. 1997   (4) Jeong H, Mason S P, Barabasi A L, et al. Lethality and centrality in protein networks. Nature,
+2001,411(6833):4
+[5   Rual J F, Venkatesan K, Hao T, et al. Towards a proteome-scale map of the human protein-   protein interaction network. Nature, 2005, 437(7062): 1173
+ (6 Bader G D. Hogue C W. An automated method for finding molecular complexes in large   protein interaction networks. BMC Bioinformatics, 2003, 4(1): 2
+ [7] Spirin V, Mirny L A. Protein complexes and functional modules in molecular networks   Proceedings of the National Academy of Sciences, 2003, 100(21): 12123-12128
+ [8] King A, Przulj I. Protein complex prediction via cost-based clustering. Bioinformatics.
+2004,20(17):3013-3020
+ /9) Pereira-Leal J B, Enright A J, Ouzounis C A. Detection of functional modules from protein
+ interaction networks. PROTEINS: Structure, Function, and Bioinformatics, 2004, 54(1)
+49-57
+ (10 Li X, Foo C S, Tan S H, et al. Interaction graph mining for protein complexes using local
+ clique merging. Genome Informatics, 2005, 16(2): 260-269
+ [III Adamcsek B, Palla G, Farkas I J, et al. CFinder: locating cliques and overlapping modules
+ in biological networks. Bioinformatics, 2006, 22(8): 1021-1023
+ [12] Palla G, Derenyi I, Farkas I J, et al. Uncovering the overlapping community structure of
+ complex networks in nature and society. Nature, 2005, 435(7043): 814-818
+ [13 Mete M, Tang F, Xu X, et al. A structural approach for finding functional modules from
+ large biological networks. Bmc Bioinformatics. 2008. 9(9): 19
+ [14] Nepusz T, Yu H, Paccanaro A. Detecting overlapping protein complexes in protein-protein
+ Interaction networks. Nature methods, 2012, 9(5): 471-472
+ [15] Zhang W, Zou X. A New Method for Detecting Protein Complexes based on the Three Node
+ Cliques. IEEE/ACM Transactions on Computational Biology Bioinformatics, 2015, 12(4)
+879-886
+[16]郑文萍，李晋玉，王杰。基于遗传算法的蛋白质复合物识别算法。计算机科学与探索，
+2018,(5)
+ (17 Leung H C, Xiang Q, Yiu S M, et al. Predicting protein complexes from PPI data: a core-
+ attachment approach. Journal of Computational Biology, 2009, 16(2): 133-144
+ (18)Wu M. Li X Kwoh C K, et al. A core-attachment based method to detect protein complexes
+ in PPI networks. BMC Bioinformatics, 2009, 10(1): 169
+
+  119 Luo J, Lin D, Cao B. A cell-core-attachment approach for identifying protein complexes   in yeast protein-protein interaction network. Journal of Intelligent Fuzzy Systems, 2016.
+31(2):967-978
+ Xu B. Guan J. From function to interaction: A new paradigm for accurately predicting pro
+ tein complexes based on protein-to-protein interaction networks. IEEE/ACM Transactions
+ on Computational Biology and Bioinformatics, 2014, II(4): 616-627
+ [211 Xu B, Guan J, Wang Y, et al. CPredictor2 0: Effectively Detecting both Small and Large   Complexes from Protein-Protein Interaction Networks. Proceedings of Proceedings of 12th
+ International Symposium, ISBRA 2016, 2016. 301-303.
+ (22) Altaf-UI-Amin M, Shinbo Y, Mihara K, et al. Development and implementation of an algo-   rithm for detection of protein complexes in large interaction networks. BMC Bioinformatics,
+2006,7(1):207
+ (23 Chua H N, Ning K, Sung W K, et al. Using indirect protein-protein interactions for protein   complex prediction. Journal of bioinformatics and computational biology, 2008, 6(03): 435
+ [24/ Friedel C C, Krumsiek J, Zimmer R. Bootstrapping the interactome: unsupervised identifi-   cation of protein complexes in yeast. Proceedings of International Conference on Research
+ in Computational Molecular Biology, 2008
+ 125] Liu G, Wong L, Chua H N. Complex discovery from weighted PPI networks. Bioinformatics
+2009,25(15):1891-1897
+ (26) Ni W Y, Xiong H, Zhao B H, et al. Predicting overlapping protein complexes in weighted   Interactome networkS. Journal of Zhejiang Universityence C, 2013, 14(10): 756-765
+ [27 Shen X, Zhao Y, Li Y, et al. An efficient protein complex mining algorithm based on Multi
+ stage Kernel Extension. Bmc Bioinformatics, 2014, 15 Suppl 12(12): 7
+ (28) Ma C, Chen YP, Berger B, et al. Identification of Protein Complexes by Integrating Multiple
+ Alignment of Protein Interaction Networks. Biointormatics, 2017, 33(11): 1681-1688
+ 129) Lubovac Z, Gamalielsson J, Olsson B. Combining functional and topological properties to
+ entify core modules in protein interaction networks. Proteins: Structure, Function, and
+ Bioinformatics, 2006, 64(4): 948-959
+ (30 Cho Y R, Hwang W, Ramanathan M, et al. Semantic integration to identify overlapping
+ functional modules in protein interaction networks. BMC Bioinformatics, 2007, 8(1): 265 (31 Kouhsar M, Zare-Mirakabad F, Jamali Y. WCOACH: Protein complex prediction in weight
+ ed PPI networks. Genes Genetic Systems, 2016, 91(1): 47
+ 132) Ulitsky I, Shamir R. Identification of functional modules using network topology and high
+ throughput data. Bmc Systems Biology, 2007, 1(1): 1-17
+ [33] Feng J, Jiang R, Jiang T. A Max-Flow-Based Approach to the Identification of Protein
+ Complexes Using Protein Interaction and Microarray Data. IEEE/ACM Transactons o
+ Computational Biology Bioinformatics, 2011, 8(3): 621-634
+ 134) Li P Hu X. He T. et al. Mining protein complexes based on connected afinity clique ex-   tension. Proceedings of IEEE International Conference on Bioinformatics and Biomedicine
+
+2014.53-56
+
+ (3S) Mehranfar A Ghadir N, Kouhsar M, et al. A Type-2 fury data fusion approach for building   reliable weighted protein interaction networks with application in protein complex detection   Computers in Biology Medicine, 2017, 88: I8  36李敏，孟样茂动态蛋白质网络的构建、分析及应用研究进展，计算机研究与发展
+2017.54(6):1281-1299   I37) Tang X, Wang, Iiu B, et al. A comparison of the functional modules identified from time  2011.12(1):339
+ PI net   1381 Wang. Peng X Li M, et al. Construction and application of dynamic protein interaction   network based on time course gene expression data. Proteomics, 2013, 13(2) 301-312   139) Ou-Yang L Dai D, Li X, et al. Detecting temporal protein complexes from dynamic protein.   protein interaction networks. Bmc Bioinformatics, 2014, 15(1): 335   (40) Shen X Li Y Jiang X, et al. Detecting temporal protein complexes based on Neighbor Close   ness and time course protein interaction networks. Proceedings of 2015 IEEE Intemational   Conference on Bioinformatics and Biomedicine(BIBM) IE EE 2015. 109-112   NII Lei X Ding Y Fujita H et al. Identification of dynamic protein complexes based on fruit fly   optimization algorithm. Knowledge-Based Systems, 2016, 105: 270-277   (42) Pan W T. A new fruit fly optimization algorithm: taking the financial distress model as an   example. Knowledge-Based Systems, 2012. 26: 69-74   (43) Xu Y. Zhou ), Zhou S et al. CPredictor3.: Effectively detecting protein complexes from   PPI networks with expression data and functional annotations. Proceedings of Procee ings   of The I6th International Conference on Bioinformatics, InCoB 2017. 2017
+ (44) Zhang Y Lin H, Yang Z, et al. Construction of dynamic probabilistic protein interaction   networks for protein complex identification. BMC Bioinformatics, 2016, 17(1): 18
+ (45) Lei X, Zhang Y. Cheng S, et al. Topology potential based seed-growth method to identify
+ protein complexes on dynamic PPI data Information Sciences, 2018, 425: 140-153
+ (46) Xie 7. Kwoh C K, Li X et al. Construction of co-complex score matrix for protein complex
+ prediction from AP- MS data. Bioinformatics, 201 1, 27(13): 159-166
+ 147) Wu M. Xie Z, Li X et al. Identifying protein complexes from heterogeneous biological data
+ Proteins Structure Function Bioinformatics, 2013, 81(11): 2023-2033
+ (48) Wu M, Ou-Yang L, Li X. Protein Complex Detection via Effective Integration of Base
+ Clustering Solutions and Co-complex Afinity Scores. IEEE/ACM Transactions on Compu
+ tational Biology& Bioinformatics, 2017, 14(3): 733-739
+49]代启国，郭茂祖。基于蛋白质网络的复合体识研究综述。智能计算机与应用，2015
+5(3):1-3
+ (50) Chua H N, Sung W, Wong L. Exploiting Indirect Neighbours and Topological Weight to   Predict Protein Function from Protein-Protein Interactions. Bioinformatics, 2006, 22(13) (51) Ashbumer, Ball C A, Blake J A, et al. Gene ontology: tool for the unification of biology   The Gene Ontology Consortium. Nature Genetics, 2000. 25(1): 9-25
+ (52)Wang J Z, Du /, Payattakool R, et al. A new method to measure the semantic similarity of   GO terms. Bioinformatics, 2007, 23(10): 1274-1281

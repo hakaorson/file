@@ -3,7 +3,7 @@
 
 \section{特征工程}
 \label{section:featEngineer}
-\subsection{蛋白质功能注释特征}
+\subsection{功能注释特征}
 \label{subsection:GoSimilarity}
 
 基因本体信息\cite{ashburner_gene_2000}即GO注释信息是描述蛋白质功能表达的词汇表，将生物活动过程进行统一编码表示，其在生物信息学邻域得到了广泛的应用。对应到蛋白质中，蛋白质分子参与的若干生物过程均可对应到GO注释表，形成对该蛋白质的综合功能描述。GO注释项总体分为三类，分别是生物过程（Biological Process）、分子功能（Molecular Function）及细胞组成（Cellular Component），生物过程描述分子功能有序组成的生命活动，分子功能描述分子在生物学上的活性，细胞组成描述了亚细胞结构及位置信息。GO注释项之间由于描述涵盖范围的不同，具有一定的从属关系，所有的GO注释项可以组成有向无环图（Directed Acyclic Graph，简称DAG）。图\ref{fig:go-dag}为QuickGO\cite{binns_quickgo_2009}网站中获取的生殖细胞发育过程对应的GO注释DAG图。GO注释信息的从属关系主要分为两种，分别是$is\_a$和$part\_of$，其中$is\_a$表示包含关系，如图中黑色箭头所示，$part\_of$表示从属关系，如图中蓝色箭头所示。图中每一个方框展示了GO注释项及其生物功能。
@@ -63,7 +63,7 @@
 \end{equation}
 
 
-\subsection{蛋白质结构域特征}
+\subsection{结构域特征}
 \label{subsection:domainSimilarity}
 蛋白质结构域时蛋白质具有独立功能和特异结构的区域，结构域互作信息影响蛋白质复合物的形成\cite{kim_relating_2006}。结构域之间具有相互作用关系，这些相互作用关系可以从三维交互域（3did）数据库\cite{mosca_3did_2014}提取，并构建成结构域相互作用网络（Domain-Domain Interaction Network，简称DDI）。
 单个蛋白质所具有的结构域可以映射到结构域互作网络的若干结点，成为一个结构域集群，而蛋白质域相似性可以转换为两个结构域集群的相互作用关系。
@@ -83,9 +83,9 @@ huang等人\cite{huang_protein-protein_2013}在运用结构域相互作用网络
 \end{figure}
 
 
-\subsection{蛋白质亚细胞特征}
+\subsection{亚细胞定位特征}
 \label{subsection:SubcellSimilarity}
-细胞是一个高度有序的结构，胞内根据空间分布和功能不同，可以分成不同细胞器或细胞区域，蛋白质只有转运到正确的部位才能参与细胞的各种生命活动，ZHANG等人\cite{zhang_protein_2007}认为蛋白质的亚细胞定位有助于研究蛋白质的生物学功能，同时对蛋白质的其他研究如相互作用、进化等也能提供必要的信息。huang等人提出\cite{huang_genome-wide_2017}使用蛋白质复合物和亚细胞定位信息预测关键蛋白质，蛋白质复合物，蛋白质复合物的生成和功能实现和其所处的细胞位置相关，因此蛋白质的亚细胞定位能对蛋白质复合物的形成产生一定的影响。本文将两个蛋白质亚细胞定位数据的交集和并集作为蛋白质的亚细胞定位特征。图\ref{fig:subcell}为苏氨酸蛋白激酶TOR1亚细胞定位图，其中黄色的部分表示其主要的注释区域，包括细胞膜和液膜。
+细胞是一个高度有序的结构，胞内根据空间分布和功能不同，可以分成不同细胞器或细胞区域，蛋白质只有转运到正确的部位才能参与细胞的各种生命活动，ZHANG等人\cite{zhang_protein_2007}认为蛋白质的亚细胞定位有助于研究蛋白质的生物学功能，同时对蛋白质的其他研究如相互作用、进化等也能提供必要的信息。huang等人提出\cite{fan_genome-wide_2017}使用蛋白质复合物和亚细胞定位信息预测关键蛋白质，蛋白质复合物，蛋白质复合物的生成和功能实现和其所处的细胞位置相关，因此蛋白质的亚细胞定位能对蛋白质复合物的形成产生一定的影响。本文将两个蛋白质亚细胞定位数据的交集和并集作为蛋白质的亚细胞定位特征。图\ref{fig:subcell}为苏氨酸蛋白激酶TOR1亚细胞定位图，其中黄色的部分表示其主要的注释区域，包括细胞膜和液膜。
 
 \begin{figure}[htbp]
     \centering
@@ -94,18 +94,58 @@ huang等人\cite{huang_protein-protein_2013}在运用结构域相互作用网络
     \label{fig:subcell}
 \end{figure}
 
-\subsection{蛋白质拓扑特征}
+\subsection{网络拓扑特征}
 \label{subsection:TopoSimilarity}
 
 
-\section{PIN及数据集构建}
-\label{section:datasetsConstruct}
-\subsection{网络结构构建}
-\label{subsection:NetConstruc}
-\subsection{数据集提取与划分}
-\label{subsection:datasetExtract}
-\subsection{子图特征}
-\label{subsection:subgraphFeat}
+\section{网络结构构建}
+\label{section:NetConstruc}
+由于酿酒酵母（Saccharomyces cerevisiae）的蛋白质相互作用中有较深入的研究，其标准复合物数据集，蛋白质相互作用数据较为完备，因此本文基于酿酒酵母的网络展开研究。
 
-\section{相关评价指标}
-\label{section:metrix}
+本文选取了主流的酿酒酵母细菌的$PPI$数据集，包括DIP\cite{salwinski_database_2004}、Krogan\cite{krogan_global_2006}、Biogrid\cite{stark_biogrid_2006}和Gavin\cite{gavin_proteome_2006}。每个数据集都由若干蛋白质相互作用对组成，表示两个蛋白质之间存在相互作用关系，依据关系数据，可以相应的构造$PIN$。
+DIP数据集是结合各种来源的信息创建的一致的$PPI$数据集，可以自动从论文中提取关系数据并更新数据库，同时有专业人员管理。
+Krogan数据集使用$LC_MS/MS$技术检测蛋白质相互作用并借助机器学习方法提高结果的可靠度，数据集分为核心和附属两个部分，本文将核心附属网络融合进行实验。
+Biogrid数据集融合了多个数据集来源，同时排出了不符合多重验证标准的相互作用。
+Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并使用socio-affinity指数评估$PPI$检测结果的可靠度。
+这些数据集的具体统计学特征如表\ref{tab:PPIStatic}所示：
+\begin{table}[h]
+    \centering
+    \caption{$PPI$数据集统计表}
+    \label{tab:PPIStatic}
+    \begin{tabular}{L{4.2cm}L{2cm}L{2cm}L{2cm}L{2cm}}
+        \toprule
+        \textbf{网络特征} & \textbf{DIP} & \textbf{Krogan} & \textbf{Biogrid} & \textbf{Gavin} \\
+        \midrule
+        蛋白质数          & 4928         & 3672            & 5573             & 1855           \\
+        相互作用数        & 17201        & 14317           & 59636            & 7669           \\
+        平均度数          & 6.98         & 7.80            & 21.40            & 8.27           \\
+        密度              & 0.0014       & 0.0021          & 0.0038           & 0.0044         \\
+        平均聚类系数      & 0.0945       & 0.1203          & 0.2483           & 0.4674         \\
+        连通个数          & 28           & 14              & 1                & 43             \\
+        最大连通结点数    & 4873         & 3642            & 5573             & 1727           \\
+        传递性            & 0.0728       & 0.1001          & 0.0657           & 0.5676         \\
+        直径              & 11           & 10              & 6                & 13             \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+$PIN$网络构建成功之后，可以在邻边上添加通过生物计算的蛋白质相互作用特征，作为图网络里面邻边的初始特征。
+
+\section{数据集提取与划分}
+\label{section:datasetExtract}
+
+有了一个复合物如何从网络中提取子图。提取出来子图之后该子图代表这个复合物。该复合物需要具有什么样的标签，整的是什么，中间是什么，负样本是什么。
+
+标准复合物是什么
+采用了两种，融合和cyc2008
+统计一下
+
+中间复合物如何取得
+
+随机复合物是怎么取得
+
+具体分为几类，因为我要学习怎么区分复合物，因此中间样本需要被看成不同的类，而处于分界中间的容易模糊，影响分类器的训练结果，因此怎么取
+同时记录着分数
+
+结果，最终。。。
+

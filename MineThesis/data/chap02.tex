@@ -37,14 +37,14 @@
 按照该计算方法，可以得到每一个注释项各自的语义值，在此基础上可以得到两个注释项$p$，$q$语义值的相似度，具体计算方法如下：
 \begin{equation}
     \label{equ:feat:go:SimItemWang}
-    Sim_{GO}(p,q)=\frac{\sum_{t \in T_p \cap T_q}(S_p(t)+S_q(t))}{SV(p)+SV(q)}
+    WSim_{GO}(p,q)=\frac{\sum_{t \in T_p \cap T_q}(S_p(t)+S_q(t))}{SV(p)+SV(q)}
 \end{equation}
 其中$t$为$p$和$q$的所有公共祖先结点。由于蛋白质通常是由多个注释项组成，因此蛋白质之间的功能相似性需要考虑两个蛋白质各自注释项之间的综合结果，其具体计算方法如下：
 \begin{equation}
     \label{equ:feat:go:SimProteinWang}
     \begin{aligned}
-        Sim_{Protein}(P,Q) & =\frac{1}{m+n}\cdot \left\{\sum_{1\leq i\leq m}{\max_{1\leq j\leq n}[{Sim_{GO}(p_i,q_j)}}]\right. \\
-                           & \left.+\sum_{1\leq j\leq n}{\max_{1\leq i\leq m}[{Sim_{GO}(p_i,q_j)}}]\right\}
+        WSim_{Protein}(P,Q) & =\frac{1}{m+n}\cdot \left\{\sum_{1\leq i\leq m}{\max_{1\leq j\leq n}[{Sim_{GO}(p_i,q_j)}}]\right. \\
+                            & \left.+\sum_{1\leq j\leq n}{\max_{1\leq i\leq m}[{Sim_{GO}(p_i,q_j)}}]\right\}
     \end{aligned}
 \end{equation}
 其中$P$，$Q$表示两个蛋白质，其中分别具有$\{p_i| i=1,2,\dots,m\}$，$\{q_j| j=1,2,\dots,n\}$的功能注释项。
@@ -53,13 +53,13 @@
 第二种蛋白质功能相似度计算方法为Lin等人\cite{lin_information-theoretic_1998}提出的方法。首先计算某两个注释项之间的相关性，具体计算过程如下：
 \begin{equation}
     \label{equ:feat:go:SimItemLin}
-    Sim_{GO}(p,q)=\min_{anc \in Ancient(p,q)}\mathcal{P} (anc)
+    LSim_{GO}(p,q)=\min_{anc \in Ancient(p,q)}\mathcal{P} (anc)
     % Sim_{GO}(p,q)=\max{\frac{2\times \log }{} }
 \end{equation}
 其中$Ancient(p,q)$表示两个注释项的公共祖先，而$\mathcal{P}$表示某一个注释项在所有蛋白质中出现的概率。这个计算公式直观的认为，两个具有相互关联的功能注释，其关联结点越稀有，则表示两个注释项的相关性越强。计算蛋白质功能相似性的计算方法如下：
 \begin{equation}
     \label{equ:feat:go:SimProteinLin}
-    Sim_{Protein}(P,Q)=\max{\frac{2\times \log \{Sim_{GO}(p,q)\}}{\log {\mathcal{P}_p}+\log {\mathcal{P}_q}} }
+    LSim_{Protein}(P,Q)=\max{\frac{2\times \log \{Sim_{GO}(p,q)\}}{\log {\mathcal{P}_p}+\log {\mathcal{P}_q}} }
 \end{equation}
 
 
@@ -67,7 +67,7 @@
 \label{subsection:domainSimilarity}
 蛋白质结构域时蛋白质具有独立功能和特异结构的区域，结构域互作信息影响蛋白质复合物的形成\cite{kim_relating_2006}。结构域之间具有相互作用关系，这些相互作用关系可以从三维交互域（3did）数据库\cite{mosca_3did_2014}提取，并构建成结构域相互作用网络（Domain-Domain Interaction Network，简称DDI）。
 单个蛋白质所具有的结构域可以映射到结构域互作网络的若干结点，成为一个结构域集群，而蛋白质域相似性可以转换为两个结构域集群的相互作用关系。
-本文中两个蛋白质的结构域互作特征包括如下方面：两个蛋白质结构域交集、并集以及相互之间的差集；映射到结构域相互网络之后，两个结构域集群之间的相互作用关系数量，其具体的计算公式如下。
+本文中两个蛋白质的结构域互作特征包括如下方面：两个蛋白质结构域交集、并集以及相互之间的差集；映射到结构域相互网络之后，两个结构域集群之间的相互作用关系数量，其具体的计算公式如下：
 \begin{equation}
     \label{equ:feat:domain}
     Sim_{domain} = \sum_{i \in dom(p)}{\sum_{j \in dom(q)}{Weight_{ij}}}
@@ -94,20 +94,61 @@ huang等人\cite{huang_protein-protein_2013}在运用结构域相互作用网络
     \label{fig:subcell}
 \end{figure}
 
-\subsection{网络拓扑特征}
+\subsection{拓扑相似性特征}
 \label{subsection:TopoSimilarity}
+蛋白质在$PIN$中所处的拓扑环境也可以作为蛋白质相似性特征的计算方式。惭愧DPClus算法\cite{altaf-ul-amin_development_2006}，本文将结点的公共邻居数作为拓扑相似性特征。具体计算方法如下：
+\begin{equation}
+    \label{equ:feat:topoCN}
+    CN_{(P,Q)} = \left\lvert N_P\cap N_Q\right\rvert
+\end{equation}
+其中$P$，$Q$为相互作用的蛋白质，$N_P$和$N_Q$分别为两个蛋白质在$PIN$中的邻居。
+
+\subsection{数据处理阶段特征汇总}
+\label{subsection:SimSummary}
+在数据预处理阶段，本文计算了$PIN$中所有蛋白质相互作用之间的相似性特征，其中包括蛋白质功能注释特征、结构域特征、亚细胞定位特征以及网络拓扑特征。$PIN$中每条相互作用边所具有的特征维度为12维，具体分布如表\ref{tab:PINedgeFeatNUms}所示：
+\begin{table}[h]
+    \centering
+    \caption{$PIN$边特征维度分布}
+    \label{tab:PINedgeFeatNUms}
+    \begin{tabular}{C{3cm}C{3cm}C{3cm}C{3cm}}
+        \toprule
+        \textbf{功能注释特征} & \textbf{结构域特征} & \textbf{亚细胞定位特征} & \textbf{网络拓扑特征} \\
+        \midrule
+        2                     & 7                   & 2                       & 1                     \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 
 \section{网络结构构建}
 \label{section:NetConstruc}
 由于酿酒酵母（Saccharomyces cerevisiae）的蛋白质相互作用中有较深入的研究，其标准复合物数据集，蛋白质相互作用数据较为完备，因此本文基于酿酒酵母的网络展开研究。
 
-本文选取了主流的酿酒酵母细菌的$PPI$数据集，包括DIP\cite{salwinski_database_2004}、Krogan\cite{krogan_global_2006}、Biogrid\cite{stark_biogrid_2006}和Gavin\cite{gavin_proteome_2006}。每个数据集都由若干蛋白质相互作用对组成，表示两个蛋白质之间存在相互作用关系，依据关系数据，可以相应的构造$PIN$。
+本文选取了主流的酿酒酵母细菌的$PPI$数据集，包括DIP\cite{salwinski_database_2004}、Krogan\cite{krogan_global_2006}、Biogrid\cite{stark_biogrid_2006}和Gavin\cite{gavin_proteome_2006}。
+
 DIP数据集是结合各种来源的信息创建的一致的$PPI$数据集，可以自动从论文中提取关系数据并更新数据库，同时有专业人员管理。
 Krogan数据集使用$LC_MS/MS$技术检测蛋白质相互作用并借助机器学习方法提高结果的可靠度，数据集分为核心和附属两个部分，本文将核心附属网络融合进行实验。
 Biogrid数据集融合了多个数据集来源，同时排出了不符合多重验证标准的相互作用。
 Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并使用socio-affinity指数评估$PPI$检测结果的可靠度。
-这些数据集的具体统计学特征如表\ref{tab:PPIStatic}所示：
+
+每个数据集都由若干蛋白质相互作用对组成，表示两个蛋白质之间存在相互作用关系，依据关系数据，可以相应的构造$PIN$。数据集具体的网络结构如图\ref{fig:ppi-datasets}所示，具体统计学特征如表\ref{tab:PPIStatic}所示。
+
+\begin{figure}[htbp]
+    \centering
+    \subcaptionbox{DIP数据集}{\label{fig:chap1:zitu:a}
+        \includegraphics[width=6cm]{ppi-dip}\hskip2cm}
+    \subcaptionbox{Krogan数据集}{\label{fig:chap1:zitu:b}
+        \includegraphics[width=6cm]{ppi-krogan}}
+    \vskip0.5cm
+    \subcaptionbox{biogrid数据集}{\label{fig:chap1:zitu:c}
+        \includegraphics[width=6cm]{ppi-biogrid}\hskip2cm}
+    \subcaptionbox{Gavin数据集}{\label{fig:chap1:zitu:d}
+        \includegraphics[width=6cm]{ppi-gavin}}
+    \caption{蛋白质相互作用数据集}\label{fig:chap2:zitu}
+    \label{fig:ppi-datasets}
+\end{figure}
+
+
 \begin{table}[h]
     \centering
     \caption{$PPI$数据集统计表}
@@ -129,23 +170,60 @@ Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并
     \end{tabular}
 \end{table}
 
-$PIN$网络构建成功之后，可以在邻边上添加通过生物计算的蛋白质相互作用特征，作为图网络里面邻边的初始特征。
+从表\ref{tab:PPIStatic}中可以看出，DIP数据集和Biogrid数据集是结点数和邻边数最大的两个数据集，同时其度数差异性较大，本文的研究工作主要围绕这两个数据集展开。最后，模型效果也会在Krogan数据集和Gavin数据集进行验证。
+
+利用$PPI$数据集构建相应的$PIN$网络结构之后，可以将蛋白质特征以及蛋白质相互作用特征添加到网络中去，形成带有生物特征的蛋白质相互作用网络$Feated-PIN$。在结点上添加蛋白质自有的特征，比如蛋白质序列长度、分子重量等等，以此作为结点的初始特征，同时在邻边上添加通过生物计算的蛋白质相互作用特征，作为图网络里面邻边的初始特征。
 
 \section{数据集提取与划分}
 \label{section:datasetExtract}
+在$Feated-PIN$的基础上，按照复合物的对应结点抽取局部图$Feated-subGraph$，该局部图包含了复合物内部蛋白质之间的相互作用关系、相关性特征数据及部分蛋白质特征数据，因此可以将局部图作为后续复合物筛选模型的输入数据。
 
-有了一个复合物如何从网络中提取子图。提取出来子图之后该子图代表这个复合物。该复合物需要具有什么样的标签，整的是什么，中间是什么，负样本是什么。
+本文正样本由酵母菌标准复合物数据集CYC2008\cite{pu_up--date_2009}和MIPS\cite{pagel_mips_2005}构成，负样本为$PIN$上在一定限制条件下产生的随机子图。COACH算法\cite{leung_predicting_2009}作为在复合物预测方法中具有一定准确度和鲁棒性的方法，其产生的样本作为中间样本。
 
-标准复合物是什么
-采用了两种，融合和cyc2008
-统计一下
+\subsection{标准复合物子图数据}
+\label{subsection:standardComplex}
+本文融合了CYC2008和MIPS数据集，剔除了其中邻居相似性（公式\ref{equ:compComplexSim:NA}）过高的部分，剩余的样本数为734。
+在PPI网络中，可能存在部分结点缺失，为了保证标准复合物的准确性，在训练过程中我们舍弃具有缺失的标准复合物。具体数据为在Biogrid网络中，正样本个数为621个，在DIP网络中，正样本个数为371。
+\subsection{中间样本复合物子图数据}
+\label{subsection:middleComplex}
+中间样本由无权COACH算法运行在目标网络中产生，需要对标准复合物和随机复合物具有一定的区分度，同时能对分类器识别复合物具有指导作用。一般情况下，通常复合物预测算法无法无法得到和标准集中的复合物完全相同的结果，在邻居相似性大于0.25时就认为复合物预测成功。
 
-中间复合物如何取得
+依据基于邻居相似性的分类标准，COACH生成的样本中有部分复合物预测成功，剩余的复合物预测失败，本文对分类模型的要求时可以区分这两类样本。在可区分该两类样本的情况下，模型对其他算法产生的结果进行筛选时，才可以正确的定位到其中预测成功的样本。因此本文将COACH生成的样本分为两类。
+由于邻居相似性处于0.25附近时，样本可能具有较大的迷惑性，反而影响模型的正常训练，因此剔除相似性在0.25附近的部分样本。
 
-随机复合物是怎么取得
+本文对中间样本具体做如下处理：
+\begin{enumerate}
+    \item 计算各个样本和标准复合物的最高邻居相似性，得到0$\thicksim$1的分数;
+    \item 剔除其中相似性分数高于0.8的样本，防止样本与标准集重合;
+    \item 将相似性分数在0.4$\thicksim$1的样本作为A样本;
+    \item 将相似性分数在0$\thicksim$0.2的样本作为B样本;
+\end{enumerate}
 
-具体分为几类，因为我要学习怎么区分复合物，因此中间样本需要被看成不同的类，而处于分界中间的容易模糊，影响分类器的训练结果，因此怎么取
-同时记录着分数
+经过上述处理，分别得到Biogrid网络和DIP网络运行COACH算法的中间样本数据集，其中Biogrid的A样本为192个、B样本为975个，DIP的A样本为179个、B样本为345个。
+\subsection{随机复合物子图数据}
+\label{subsection:randomComplex}
 
-结果，最终。。。
+随机符合物是在互作网络中随机游走产生的随机图，结合标准样本和中间样本具有紧密型子图的特点，本文对随机游走算法做了一定限制。
+
+首先按照图结点的权重选取初始结点，视作子图。对子图周围所有邻居结点设置权重，邻居结点与子图连接数越高，则该邻居结点权重越高。按照邻居结点权重加权随机抽取下一个结点，并将该结点加入子图，如此反复进行直至子图结点个数达到阈值。按照该种随机子图生成方法，子图趋向于密集连接。由于负样本在子图结构上和正样本相近，在进行分类任务时，可以避免模型学习简单的拓扑差异，迫使模型学习复合物内在的形成规律，达到主动学习的目的。
+
+本文在网络中按照真实样本的结点数分布抽取负样本，负样本个数为标准样本和中间样本之和。
+
+\subsection{总体数据集}
+\label{subsection:allComplex}
+最终产生的整体结果如下表所示：
+
+\begin{table}[h]
+    \centering
+    \caption{数据集分布统计表}
+    \label{tab:datasets:statistic}
+    \begin{tabular}{C{3cm}C{3cm}C{3cm}C{3cm}C{3cm}}
+        \toprule
+        \textbf{网络} & \textbf{正样本数} & \textbf{中间样本数（A）} & \textbf{中间样本数（B）} & \textbf{负样本数} \\
+        \midrule
+        Krogan数据集  & 621               & 192                      & 975                      & 819               \\
+        DIP数据集     & 371               & 179                      & 345                      & 764               \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 

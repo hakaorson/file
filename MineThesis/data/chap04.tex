@@ -3,25 +3,59 @@
 两个网络上计算，因为比较经典
 额外的三个方法测试，
 只有最后最优模型才在四个网络上全跑，但是只是写一个同时，然后放一个实验结果说明有效就可以了
-\section{相关参数和评价指标}
-\label{section:metrix}
+\section{实验设计}
+\label{section:workdesign}
+\subsection{模型细节}
+\label{subsection:trainModel}
 
-基于第
+由于训练数据的不平衡性，训练模型之前，数据进行了重采样处理，保持各分类训练样本相等。按照$8:2$的比率分割各分类样本，形成训练集和测试集。
+本文采用0.001的学习率，batch大小设置为32，隐层维度为128，模型使用了两层的GCN网络以及两层的分类器。
 
+激活函数和优化器TODO
 
-数据集分割等等
-需要告诉算法的一般性设计，包括损失函数，batch等等
+每一个训练复合物样本都具有复合物类别以及相似性评分两项数据，针对这两项属性，本文实验中分别设置了两项损失函数，使用交叉熵损失（Cross Entropy Loss）计算复合物类别分类损失，使用BCE损失（Binary Cross Entropy Loss）计算复合物得分回归损失。由于两项损失在数值上的差异，设置了相应的损失平衡系数。具体损失计算如下所示。
+\begin{equation}
+    \label{equ:loss}
+    loss=CELoss(PL,TL)+\alpha \cdot BCELoss(PS,TS)
+\end{equation}
+其中，$PL$为预测类别，$TL$为真实类别，$PS$为预测评分，$TS$为真实评分，$\alpha$为损失平衡系数。
 
-分类模型常用指标，precision，recall、fi。macro等等
-
-复合物上的评价指标。。。
-
-
+模型测试阶段，本文将复合物生成算法A在$PIN$网络中运行得到算法A预测的复合物$Complexes_A$，用腹黑谁分类模型筛选所有预测结果，其中如果预测样本在筛选模型中被分类为真样本或者评分高于0.25时，预测样本即可通过筛选。最后所有通过筛选的复合物形成复合物集合$Complexes_A'$。最后使用F1值和PPV指标评估$Complexes_A$和$Complexes_A'$的复合物质量。
+\subsection{评估指标}
+\label{subsection:netrix}
+评价复合物预测结果的常用指标为精准率（precision）、召回率（recall）和F1值（F1-score）。预测复合物和标准复合物计算邻居相似性（NA-similarity）\ref{equ:compComplexSim:NA}，计算方式如下所示。
 \begin{equation}
     \label{equ:compComplexSim:NA}
-    NA_{(\mathcal{P} ,\mathcal{Q} )} = \frac{{\left\lvert V_{\mathcal{P}} \cap V_{\mathcal{Q}}\right\rvert}^2 }{{\left\lvert V_{\mathcal{P}} \right\rvert}\cdot  {\left\lvert V_{\mathcal{Q}} \right\rvert}} 
+    NA_{(\mathcal{P} ,\mathcal{Q} )} = \frac{{\left\lvert V_{\mathcal{P}} \cap V_{\mathcal{Q}}\right\rvert}^2 }{{\left\lvert V_{\mathcal{P}} \right\rvert}\cdot  {\left\lvert V_{\mathcal{Q}} \right\rvert}}
 \end{equation}
-其中$\mathcal{P}=(V_{\mathcal{P}} ,E_{\mathcal{P}})$是预测的复合物，$V_{\mathcal{P}}$为复合物中的蛋白质，$E_{\mathcal{P}}$为复合物中的相互作用，$\mathcal{Q}=(V_{\mathcal{Q}} ,E_{\mathcal{Q}})$是标准的复合物。
+其中$\mathcal{P}=(V_{\mathcal{P}} ,E_{\mathcal{P}})$是预测复合物，$V_{\mathcal{P}}$为复合物中的蛋白质，$E_{\mathcal{P}}$为复合物中的相互作用，$\mathcal{Q}=(V_{\mathcal{Q}} ,E_{\mathcal{Q}})$是标准复合物。
+
+按照一般性标准，邻居相似性大于0.25时，预测复合物和标准复合物具有匹配性，表示复合物预测成功。
+精准率计算如公式\ref{equ:precision}所示。
+其中$PC$为预测复合物集合，$M_{PC}$为预测复合物中具有匹配性的所有复合物集合。精准率表示预测复合物中，预测成功的样本所占比重，衡量预测结果的“查准率”。
+召回率段计算如公式\ref{equ:recall}所示。
+其中$BC$为标准复合物集合，$M_{BC}$为标准复合物中被预测复合物匹配的集合。召回率表示标准复合物中，能被预测复合物匹配的样本所占的比重，衡量预测结果的“查全率”。
+F1值综合考虑查准率和查全率，计算如公式\ref{equ:f1}所示。
+从定义看出，当查准率和查全率中有一项指标偏小时，F1值就会偏小。
+\begin{equation}
+    \label{equ:precision}
+    precision=\frac{\left\lvert M_{PC}\right\rvert }{\left\lvert PC\right\rvert }
+\end{equation}
+\begin{equation}
+    \label{equ:recall}
+    recall=\frac{\left\lvert M_{BC}\right\rvert }{\left\lvert BC\right\rvert }
+\end{equation}
+\begin{equation}
+    \label{equ:f1}
+    f-score=\frac{2\times precision\times recall}{precision + recall }
+\end{equation}
+
+除此之外，评价复合物预测质量还可采用PPV指标（Cluster-wise Positive Predictive Value）\cite{shi_protein_2011}，其具体计算方式如式\ref{equ:PPV}所示，其中${j| 1,2,\dots,m }$表示所有的预测复合物，${i| 1,2,\dots,n }$表示所有的标准复合物，$t_{ij}$表示两个复合物$i,j$之间共同蛋白质的数量。PPV值越高，表示预测复合物和标准复合物的平均重合度越高。
+
+\begin{equation}
+    \label{equ:PPV}
+    PPV=\frac{\sum_{j = 1}^{m} \max_{i=1}^{n} t_{ij}}{\sum_{i = 1}^{n} \sum_{j = 1}^{m}   t_{ij}}
+\end{equation}
 
 \section{生物特征的影响}E
 \label{section:biofeatAnasys}
@@ -38,7 +72,7 @@
 \label{section:fusionfeatAnasys}
 同时加上部分蛋白质的生物特征
 
-\section{图读出算法的影响}
+\section{图读出方法的影响}
 \label{section:gpoolAnasys}
 得出最佳模型，并和刘晓霞做比较，由于什么的限制，只能在我的数据上跑刘晓霞的方法
 

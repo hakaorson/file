@@ -7,6 +7,7 @@
 \label{subsection:GoSimilarity}
 
 基因本体信息\cite{ashburner_gene_2000}即GO注释信息是描述蛋白质功能表达的词汇表，将生物活动过程进行统一编码表示，其在生物信息学邻域得到了广泛的应用。对应到蛋白质中，蛋白质分子参与的若干生物过程均可对应到GO注释表，形成对该蛋白质的综合功能描述。GO注释项总体分为三类，分别是生物过程（Biological Process）、分子功能（Molecular Function）及细胞组成（Cellular Component），生物过程描述分子功能有序组成的生命活动，分子功能描述分子在生物学上的活性，细胞组成描述了亚细胞结构及位置信息。GO注释项之间由于描述涵盖范围的不同，具有一定的从属关系，所有的GO注释项可以组成有向无环图（Directed Acyclic Graph，简称DAG）。图\ref{fig:go-dag}为QuickGO\cite{binns_quickgo_2009}网站中获取的生殖细胞发育过程对应的GO注释DAG图。GO注释信息的从属关系主要分为两种，分别是$is\_a$和$part\_of$，其中$is\_a$表示包含关系，如图中黑色箭头所示，$part\_of$表示从属关系，如图中蓝色箭头所示。图中每一个方框展示了GO注释项及其生物功能。
+
 \begin{figure}[htbp]
     \centering
     \includegraphics{go-dag}

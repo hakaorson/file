@@ -1,10 +1,53 @@
-\chapter{实验结果与分析}
-\label{chapter:resultAndOther}
-\section{实验设计}
-\label{section:workdesign}
-\subsection{模型细节}
-\label{subsection:trainModel}
+\chapter{基于图卷积神经网络的复合物筛选模型}
+\label{chapter:NodeConv}
 
+\section{图卷积神经网络介绍}
+\label{section:NodeConv:intro}
+
+
+
+\section{模型提出}
+\label{section:NodeConv:Put}
+
+已有的基于监督学习的复合物预测算法，基本都是基于挖掘复合物子图的拓扑特征，比如图的密度、图的结点个数、平均度数等等，将图的所有拓扑特征置于一个向量中，构成一个$1\times N$的向量，用该向量代替子图，最后将向量用于训练分类模型。具体过程如图\ref{fig:entropy-classification}所示。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=14cm]{entropy-classification}
+    \caption{基于图拓扑特征的蛋白质复合物分类模型}
+    \label{fig:entropy-classification}
+\end{figure}
+
+
+但是蛋白质复合物中，有大部分复合物是小尺度复合物，其蛋白质个数小于5个。此类复合物的拓扑结构结构简单，提取的拓扑特征具有趋同性。随机的子图在结点数较少的情况下可能形成相同的拓扑特征，此时分类模型无法区分子图是否为真正的复合物。
+
+为了解决该问题，在不引入额外的生物学信息的情况下，本文提出了基于全局特征的复合物分类模型。
+蛋白质复合物网络是一个高维结构，可以通过挖掘蛋白质在网络中所处的位置和其周围相互作用关系挖掘蛋白质的潜在特征表示，将网络的高维数据转换为蛋白质的低维嵌入表示，成为每一个蛋白质初始的特征向量。
+
+\section{复合物子图中图卷积神经网络的实现}
+\label{section:NodeConv:detail}
+
+本文使用了两种蛋白质特征嵌入模型，分别为Deepwalk和GAE。
+
+
+
+
+
+\section{算法具体实现与流程}
+\label{section:NodeConv:flow}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=14cm]{node-classification-flow}
+    \caption{基于全局特征的分类模型总体流程}
+    \label{fig:node-classification-flow}
+\end{figure}
+基于全局特征的复合物分类模型总体结构如图\ref{fig:node-classification-flow}所示。基于Deepwalk和GAE编码，蛋白质嵌入特征维度总共80维，在$PIN$中加入嵌入特征之后，蛋白质复合物子图具备了初始的结点特征向量。图卷积神经网络\ref{section:NodeConv:intro}具有动态融合结点特征和拓扑结构的能力，已经广泛应用于图任务中。
+初始嵌入的80维特征是整个$PIN$网络中结点特征的描述，但是还未结合蛋白质复合物子图的拓扑关系。因此，本文在后续的图分类任务中加上了两层GCN网络对蛋白质结点特征和子图拓扑结构进行融合，增加蛋白质结点特征对复合物内部蛋白质互作关系的描述能力。
+最终基于全局特征的复合物分类模型对子图的蛋白质结点特征做平均池化，作为蛋白质复合物特征的输出，以多层感知器预测复合物的分类结果。
+
+\section{实验参数与评估指标}
+\label{section:NodeConv:allExperienceDesign}
 由于训练数据的不平衡性，训练模型之前，数据进行了重采样处理，保持各分类训练样本相等。按照$8:2$的比率分割各分类样本，形成训练集和测试集。在分类模型的训练过程中，观察训练集和测试集的损失函数，根据早停策略得到未过拟合最佳模型。
 本文采用0.001的学习率，batch大小设置为32，隐层维度为128，模型使用了两层的GCN网络以及两层的分类器。
 采用LeakyRelu\ref{fig:leakyrelu}作为激活函数和AdamOptimism作为模型优化器。
@@ -24,8 +67,6 @@
 其中，$PL$为预测类别，$TL$为真实类别，$PS$为预测评分，$TS$为真实评分，$\alpha$为损失平衡系数。
 
 模型测试阶段，本文将复合物生成算法A在$PIN$网络中运行得到算法A预测的复合物$Complexes_A$，用腹黑谁分类模型筛选所有预测结果，其中如果预测样本在筛选模型中被分类为真样本或者评分高于0.25时，预测样本即可通过筛选。最后所有通过筛选的复合物形成复合物集合$Complexes_A'$。最后使用F1值和PPV指标评估$Complexes_A$和$Complexes_A'$的复合物质量。
-\subsection{评估指标}
-\label{subsection:netrix}
 评价复合物预测结果的常用指标为精准率（precision）、召回率（recall）和F1值（F1-score）。预测复合物和标准复合物计算邻居相似性（NA-similarity）\ref{equ:compComplexSim:NA}，计算方式如下所示。
 \begin{equation}
     \label{equ:compComplexSim:NA}
@@ -80,9 +121,10 @@ Acc值综合考虑了Sn值和PPV值的结果，能更全面的反应预测复合
     SPA= Sn+PPV+Acc
 \end{equation}
 
-\section{全局特征的影响}
-\label{section:globalStructfeatAnasys}
-本文在\ref{section:GlobalfeatBaseModel}部分提出了基于全局特征的复合物筛选模型，该模型使用蛋白质网络得到蛋白质编码，在复合物子图中使用GCN网络将蛋白质编码和子图拓扑结构进行融合。
+\section{实验设计及结果分析}
+\label{section:NodeConv:experience}
+
+本章提出了基于全局特征的复合物筛选模型，该模型使用蛋白质网络得到蛋白质编码，在复合物子图中使用GCN网络将蛋白质编码和子图拓扑结构进行融合。
 该模型未引入额外的生物学信息，为了验证模型的有效性，本文进行了如下的对比试验。
 
 第一个对比的模型是使用随机特征GCN图分类模型，子图GCN网络输入的结点特征为随机数据，通过该模型的对比验证全局特征的有效性。
@@ -137,103 +179,5 @@ Acc值综合考虑了Sn值和PPV值的结果，能更全面的反应预测复合
 
 从上述结果可以得出。全局特征的GCN筛选方法对原始的样本数据的评价指标都有不同程度的提升。
 
-\section{生物特征的影响}
-\label{section:biofeatAnasys}
-为了验证生物特征的添加对算法模型的提升，本文对比了在不添加生物数据，而使用相同的GCN结构的情况下，复合物分类模型对样本质量的提升程度。实验在DIP和Biogrid网络中分别运行了Dpclus、Clique和IPCA三个复合物生成算法。实验结果如下所示。
-\begin{figure}[htbp]
-    \centering
-    \subcaptionbox{F1值对比}{\label{fig:result/DIP/F1/edge}
-        \includegraphics[width=10cm]{result/DIP/F1/edge}}
-    \vskip0.2cm
-    \subcaptionbox{SPA值对比}{\label{fig:result/DIP/SPA/edge}
-        \includegraphics[width=10cm]{result/DIP/SPA/edge}}
-    \caption{DIP网络不同模型处理后结果对比}
-    \label{fig:result/DIP/edge}
-\end{figure}
-
-图\ref{fig:result/DIP/edge}为在DIP网络中，随机特征模型和基于生物特征的模型筛选之后结果的对比。
-从图中可以看出，添加了生物特征后，在DIP网络中复合物的生成质量得到了相应的提升，同样的由于CLique算法的特征，该算法的前后对比提升幅度最为明显。
-
-图\ref{fig:result/Biogrid/edge}为在Biogrid网络中，随机特征模型和基于生物特征的模型筛选之后结果的对比。
-\begin{figure}[htbp]
-    \centering
-    \subcaptionbox{F1值对比}{\label{fig:result/Biogrid/F1/edge}
-        \includegraphics[width=10cm]{result/Biogrid/F1/edge}}
-    \vskip0.2cm
-    \subcaptionbox{SPA值对比}{\label{fig:result/Biogrid/SPA/edge}
-        \includegraphics[width=10cm]{result/Biogrid/SPA/edge}}
-    \caption{Biogrid网络不同模型处理后结果对比}
-    \label{fig:result/Biogrid/edge}
-\end{figure}
-从图中可以看出添加了生物特征后，Biogrid网络相应样本的F1值均有较为明显的提升，而Clique算法的样本提升最为明显。综合评价指标SPA值也具有一定的提升。
-
-
-\section{特征融合模型的实验结果分析}
-\label{section:fusionfeatAnasys}
-图\ref{fig:result/DIP/fusion}为在DIP网络中，基于结点的全局特征模型、基于邻边的生物特征模型以及特征融合模型筛选之后结果的对比。
-\begin{figure}[htbp]
-    \centering
-    \subcaptionbox{F1值对比}{\label{fig:result/DIP/F1/fusion}
-        \includegraphics[width=10cm]{result/DIP/F1/fusion}}
-    \vskip0.2cm
-    \subcaptionbox{SPA值对比}{\label{fig:result/DIP/SPA/fusion}
-        \includegraphics[width=10cm]{result/DIP/SPA/fusion}}
-    \caption{DIP网络不同模型处理后结果对比}
-    \label{fig:result/DIP/fusion}
-\end{figure}
-
-图\ref{fig:result/Biogrid/fusion}为在Biogrid网络中，基于结点的全局特征模型、基于邻边的生物特征模型以及特征融合模型筛选之后结果的对比。
-\begin{figure}[htbp]
-    \centering
-    \subcaptionbox{F1值对比}{\label{fig:result/Biogrid/F1/fusion}
-        \includegraphics[width=10cm]{result/Biogrid/F1/fusion}}
-    \vskip0.2cm
-    \subcaptionbox{SPA值对比}{\label{fig:result/Biogrid/SPA/fusion}
-        \includegraphics[width=10cm]{result/Biogrid/SPA/fusion}}
-    \caption{Biogrid网络不同模型处理后结果对比}
-    \label{fig:result/Biogrid/fusion}
-\end{figure}
-
-\section{不同复合物特征提取方法的对比}
-\label{section:gpoolAnasys}
-
-图\ref{fig:result/DIP/readout}为在DIP网络中，采用不同图读出方法筛选之后结果的对比。
-\begin{figure}[htbp]
-    \centering
-    \subcaptionbox{F1值对比}{\label{fig:result/DIP/F1/readout}
-        \includegraphics[width=10cm]{result/DIP/F1/readout}}
-    \vskip0.2cm
-    \subcaptionbox{SPA值对比}{\label{fig:result/DIP/SPA/readout}
-        \includegraphics[width=10cm]{result/DIP/SPA/readout}}
-    \caption{DIP网络不同模型处理后结果对比}
-    \label{fig:result/DIP/readout}
-\end{figure}
-
-图\ref{fig:result/Biogrid/readout}为在Biogrid网络中，采用不同图读出方法筛选之后结果的对比。
-\begin{figure}[htbp]
-    \centering
-    \subcaptionbox{F1值对比}{\label{fig:result/Biogrid/F1/readout}
-        \includegraphics[width=10cm]{result/Biogrid/F1/readout}}
-    \vskip0.2cm
-    \subcaptionbox{SPA值对比}{\label{fig:result/Biogrid/SPA/readout}
-        \includegraphics[width=10cm]{result/Biogrid/SPA/readout}}
-    \caption{Biogrid网络不同模型处理后结果对比}
-    \label{fig:result/Biogrid/readout}
-\end{figure}
-
-% 为了研究模型的有效性，进一步在Krogan和Gavin网络中进行了实验。其实验结果如下\ref{fig:result/other}所示。
-
-% \begin{figure}[htbp]
-%     \centering
-%     \subcaptionbox{Krogan网络中F1值和SPA值的提升}{\label{fig:result/other/krogan}
-%         \includegraphics[width=10cm]{result/other/krogan}}
-%     \vskip0.2cm
-%     \subcaptionbox{Gavin网络中F1值和SPA值的提升}{\label{fig:result/other/gavin}
-%         \includegraphics[width=10cm]{result/other/gavin}}
-%     \caption{模型在不同网络中的适应性}
-%     \label{fig:result/other}
-% \end{figure}
-
-
-\section{实验总结与分析}
-\label{section:resultSummary}
+\section{本章小结}
+\label{section:NodeConv:summary}

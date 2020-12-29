@@ -1,8 +1,9 @@
 \chapter{绪论}
 \label{chapter:intro}
 
+
 \section{研究背景}
-\label{section:background}
+\label{section:intro:background}
 
 生物信息学是研究生物信息的采集、处理、存储、传播和解释等各方面的学科。
 生物信息学可以帮助人类从海量的生物数据中挖掘内部的生理过程规律，从而指导进一步的生物学研究。在规模化实验大力发展和海量数据爆发的如今，如何有效的利用生物数据变得越来越中了。
@@ -25,18 +26,18 @@
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=10cm]{ppi-dip-color}
-  \caption{酵母菌蛋白质相互作用网络}
+  \caption{酵母菌蛋白质相互作用网络（部分）}
   \label{fig:ppi}
 \end{figure}
 已知的蛋白质复合物可以视作互作网络里面的一系列子网络，因此利用图论和计算模型学习子网络的分布模式，即可在互作网络中发掘潜在的蛋白质复合物\cite{legrain_proteinprotein_2001}。利用图论的方法，蛋白质互作网络可以转换为无向图~$G=(V,E)$。其中$V$为图中结点的集合，表示所有的蛋白质，$E$为图中邻边的集合，表示所有的蛋白质互作关系。$PIN$转换为图结构之后，图论上的计算模型和深度学习方法就可以迁移到蛋白质复合物的研究中。2002年，Tong\cite{tong_combined_2002}等人提出了密集子图的假说，蛋白质复合物在$PIN$是密集链接的子图，而与其他的蛋白质连接相对稀疏。在$PIN$中预测蛋白质复合物的问题就转换为了密集子图的挖掘问题，逐渐发展出了利用$PIN$和计算方法识别蛋白质复合物的理论。
 
 \section{国内外研究现状}
-\label{section:research}
+\label{section:intro:research}
 
 现有的基于计算方法的蛋白质复合物预测方法主要分为五类：基于网络结构的图聚类方法、融合生物信息的图聚类方法、核心附属扩展方法、动态网络方法以及监督学习方法。以下分别对这五类方法的研究现状做简单的介绍。
 
 \subsection{基于网络结构的图聚类方法}
-\label{subsection:TopologyMethod}
+\label{subsection:research:TopologyMethod}
 
 现有大多数复合物预测方法为基于网络结构的图聚类方法，基本思路是在无权无向图中挖掘密集子图。这类方法较为简单明确，取得了一定的成果。
 
@@ -54,7 +55,7 @@ CPridict算法\cite{xu_function_2014}首先计算蛋白质之间的功能相似�
 CODEC算法\cite{geva_identification_2011}基于质谱实验将蛋白质分类为诱饵蛋白和靶标蛋白，从靶标蛋白及其邻居结点开始，通过增减结点获得最大子图得分。
 
 \subsection{网络预处理的图聚类方法}
-\label{subsection:appendBiology}
+\label{subsection:research:appendBiology}
 蛋白质复合物的预测是一个复杂的生物学问题，而由于实验手段的限制，互作数据存在着高假阴性和高假阳性的缺陷\cite{von_mering_comparative_2002}。研究者开始尝试挖掘网络拓扑特征，对网络结构进行修复和连边加权处理，提高$PIN$的可信度以获取更精确的聚类结果。
 DPClus算法\cite{altaf-ul-amin_development_2006}最早对$PIN$做加权处理，根据一对结点公共邻居数量给这对结点之间的边加权，结点的权重所有邻边的权重之和。权重较大的结点作为种子结点，通过紧密型结点的连接预测蛋白质复合物。
 PCP算法\cite{chua_using_2008}利用使用FS-weight计算邻边的可靠度，并移除网络中可靠度较低的边，之后利用完全图发现合并算法检测复合物。
@@ -71,7 +72,7 @@ GFA算法\cite{jianxing_feng_max-flow-based_2011}基于最密子图算法获取�
 
 
 \subsection{核心附属扩展方法}
-\label{subsection:CoreAppend}
+\label{subsection:research:CoreAppend}
 
 SCAN算法\cite{mete_structural_2008}已经提出了基于种子蛋白质扩展的复合物预测方法。然而种子蛋白质仅仅时拓扑结构上的聚类核心，并不具有明显的生物学意义。研究人员\cite{gavin_proteome_2006}通过酵母菌中复合物的结构发现，部分蛋白质存在于多种复合物中，且这些蛋白质之间存在大量的相互作用关系，组成了复合物的功能单元，此类蛋白质被称为核心蛋白质。在一个复合物中其余蛋白质附着于核心蛋白质，被称为附属蛋白质。如图\ref{fig:core_append}所示，其中深色椭圆形底框部分为复合物中的核心模块。
 
@@ -85,15 +86,15 @@ CORE算法\cite{leung_predicting_2009}是基于蛋白质复合物核心附属形
 \end{figure}
 
 \subsection{监督学习方法}
-\label{subsection:Supervision}
+\label{subsection:research:Supervision}
 \subsection{动态网络方法}
-\label{subsection:Dynamic}
+\label{subsection:research:Dynamic}
 
 由于蛋白质会随着生理生化周期不断变化，因此蛋白质相互作用也具有动态特性，部分研究\cite{li_dynamic_2017}将基因表达时序数据和蛋白质相互作用结合，构建动态蛋白质相互作用网络$Dynamic-PIN$。
 Tang等人\cite{tang_comparison_2011}设定阈值，将蛋白质基因表达数据超过阈值的蛋白质视为活跃蛋白质，以活跃蛋白质构建动态网络。Ou-Yang等人\cite{ou-yang_detecting_2014}使用基因表达数据区分瞬态和稳态蛋白质。
 
 \subsection{方法总结}
-\label{subsection:researchSummary}
+\label{subsection:research:researchSummary}
 
 表\ref{tab:MethodSummary}给出了现有复合物预测方法的类别、思想以及相关特点。
 
@@ -115,10 +116,11 @@ Tang等人\cite{tang_comparison_2011}设定阈值，将蛋白质基因表达数�
 \end{table}
 
 
+\section{复合物筛选框架的研究动机和思路}
+\label{section:intro:motivationAndThinking}
 
-\section{研究动机和思路}
-\label{section:motivation}
-
+\subsection{研究动机}
+\label{subsection:motivationAndThinking:motivation}
 国内外学者对复合物的识别已经提出了诸多方法，总体趋势也是趋向于融合生物数据和网络数据并达到更精确的预测，但是目前现有的方法还存在以下的不足。
 \begin{itemize}
 
@@ -126,11 +128,12 @@ Tang等人\cite{tang_comparison_2011}设定阈值，将蛋白质基因表达数�
 
   \item 复合物准确度较低。部分模型方法如RNSC算法\cite{king_protein_2004}、Clique算法\cite{spirin_protein_2003}等等具有很强的随机性，此类方法为了达到较高的复合物召回率，往往倾向于产生过量的候选复合物，导致结果的准确率的降低。预测的复合物中存在大量错误的样本，对后续的生物研究有一定的影响。如何在维持复合物预测召回率的情况下，提高预测的准确度是一个值得研究的问题。
 
-  \item 生物信息在$PIN$中融合度低。在\ref{subsection:appendBiology}中提到了融合生物信息的诸多方法，然而这些方法只停留在利用生物信息更改$PIN$邻边权重的层面，不同的生物信息如GO注释、基因表达信息、蛋白质保守性等数据被统一编码到了相互作用的边权重中，这个编码转换过程会丢失原有丰富的生物数据。编码过程仅仅作为$PIN$数据的预处理，生物数据无法动态地参与到复合物预测模型的框架设计中。同时，目前也没有方法将生物信息编码到蛋白质结点中，如何有效的利用结点编码增强复合物的预测质量也是一个亟待解决的问题。
+  \item 生物信息在$PIN$中融合度低。在\ref{subsection:research:appendBiology}中提到了融合生物信息的诸多方法，然而这些方法只停留在利用生物信息更改$PIN$邻边权重的层面，不同的生物信息如GO注释、基因表达信息、蛋白质保守性等数据被统一编码到了相互作用的边权重中，这个编码转换过程会丢失原有丰富的生物数据。编码过程仅仅作为$PIN$数据的预处理，生物数据无法动态地参与到复合物预测模型的框架设计中。同时，目前也没有方法将生物信息编码到蛋白质结点中，如何有效的利用结点编码增强复合物的预测质量也是一个亟待解决的问题。
 \end{itemize}
 
 
-
+\subsection{研究思路}
+\label{subsection:motivationAndThinking:thinking}
 针对以上的问题，本文提出了一种基于监督学习和融合特征的复合物筛选模型。
 
 算法的核心思想是利用已有的生物数据，包括$PIN$、生物注释信息、已知复合物等等，通过监督学习的方式构建一个鲁棒性的复合物分类模型。模型能够较为准确的辨别某一个复合物是否为真实复合物。在此模型训练成功的前提下，将一般性的复合物预测算法，比如DPClus算法\cite{altaf-ul-amin_development_2006}、MCODE算法\cite{bader_automated_2003}等产生的复合物交由分类模型做进一步筛选，相当于filter过程，剔除其中得分较低的样本，保留得分高的样本作为预测的最终结果。由于无效样本的剔除，理论上经过filter的处理，最终预测结果的多项评价指标可以提升。
@@ -141,10 +144,28 @@ Tang等人\cite{tang_comparison_2011}设定阈值，将蛋白质基因表达数�
 
 部分复合物筛选算法，如Clique算法\cite{spirin_protein_2003}、Dpclus算法等，是基于随机种子以及子图扩展的方法。这类方法由于能够广泛的挖掘整个$PPI$网络的所有结点，因此其预测结果能够匹配出多数已知的蛋白质复合物。但是此类方法会过多样本，其中大量的具有随机性的复合物对总体的预测结果具有干扰性。使用复合物筛选模型剔除具有随机性的负样本，可以在保持该类方法高召回率的同时，提高预测结果的准确度。
 
-% 复合物的发现问题，这个模型具有指导性，高分复合物很可能是为发现复合物，具有较高的研究价值。
+\subsection{筛选框架实现流程}
+\label{subsection:motivationAndThinking:flow}
+
+复合物筛选模型框架设计如图\ref{fig:main-process}所示；
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=14cm]{main-process}
+    \caption{复合物筛选框架主体流程图}
+    \label{fig:main-process}
+\end{figure}
+
+首先依照\ref{section:featSubNetworkConstruct:allSample}提出的数据集构建方法，对每一个复合物网络可以得到一个由复合物子图构成的数据集。该数据集中每一个复合物子图有和标准复合物的邻居相似性评分，总体分为四类复合物，分别为标准复合物、高评分预测复合物、低评分预测复合物和随机复合物。
+
+第一阶段，提出合适的复合物分类模型，并基于该数据集训练复合物分类模型\ref{chapter:NodeConv}，\ref{chapter:EdgeConv}，\ref{chapter:MPNN}。
+
+第二阶段，在蛋白质相互作用网络中得到复合物预测算法，如MCODE算法、clique算法等的预测结果。依据复合物分类结果的评价方法，在这些预测结果中，有一部分高分样本复合物预测符合预期结果，如图中绿色部分所示，其余部分为低分复合物样本，如图中红色部分所示。下一步利用复合物分类模型对所有的样本进行筛选，通过筛选的复合物符合模型学习到的复合物一般分布规律，筛选之后保留的复合物如图最终输出结果所示。
+
+第三阶段，本文使用多种的复合物预测评价指标对筛选前后的总体样本进行综合评价。
 
 \section{研究工作及成果}
-\label{section:workandresult}
+\label{section:intro:workandresult}
 
 本文的主要研究工作是基于特征网络的蛋白质复合物筛选算法。针对现有的复合物预测算法无法利用先验知识，本文提出了基于监督学习的复合物筛选模型；针对复合物预测结果精度低，本文提出了二阶段的筛选方法，并进行对比实验验证筛选之后预测样本的评价指标得到了提高；针对现有预测方法无法动态融合$PIN$拓扑结构与相关的特征数据，本文提出了多种特征融合方法，并在方法间进行了对比实验。
 
@@ -166,7 +187,7 @@ Tang等人\cite{tang_comparison_2011}设定阈值，将蛋白质基因表达数�
 \end{itemize}
 
 \section{论文组织}
-\label{section:organization}
+\label{section:intro:organization}
 
 本论文分为五大章节，具体如下：
 

@@ -1,0 +1,45 @@
+\documentclass[degree=doctor,bibtype=numeric]{tongjithesis}
+\usepackage{tongjiutils}
+
+%参考文献更新使用biblatex包, 使用gb7714-2015标准, 具体参数设置可在cls文件中搜索biblatex进行了解
+%加入bib文件(老版本文件依然能够使用)
+\addbibresource{ref/refs_from_zotero.bib}   %
+
+
+\begin{document}
+
+% 定义所有的eps文件在 figures 子目录下
+\graphicspath{{figures/}}
+
+
+%%% 封面部分
+\frontmatter
+\input{data/cover}
+\makecover
+
+
+% 目录
+\tableofcontents
+% 符号对照表
+\begin{denotation}
+    \input{data/denotation}
+\end{denotation}
+
+%%% 以下索引按需要选择
+% 插图索引
+\listoffigures
+% 表格索引
+\listoftables
+% 公式索引
+% \listofequations
+%%% 正文 
+\mainmatter
+\include{data/newchap01}
+\include{data/newchap02}
+\include{data/newchap03}
+\include{data/newchap04}
+\include{data/newchap05}
+\include{data/newchap06}
+% 参考文献
+\printTJbibliography
+\end{document}

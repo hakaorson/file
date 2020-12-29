@@ -1,0 +1,65 @@
+ oust T, Yu H, Pac   naro   A. Detecting   interaction networks. Nature Methods, 2012, 9(5): 471-472   [96] Nepi
+ 197] Christian V M. Roland K, Berend S, et al. Comparative assessment of large-scale data sets  99-403
+ of   protein-protein interactions. Nature, 2002, 417(6887): 3   [98] Altaf-Ul-Amin M, Shinbo Y, Mihara K, et al. Development and implementation of an algo   rithm for detection of protein complexes in large interaction networks. BMC Bioinformatics.
+2006,7(1):207.
+ 199)Chua H N, Ning K, Sung W K, et al. e   ndirect protein-protein interactions for
+ protein complex prediction   Journal of Biol   informatics and Computational Biology, 2008
+6(03):435-466   [1001 Chua H N, Sung W K, Wong L Exploiting indirect neighbours and topological weight to pre   dict protein function from protein-protein interactions. Bioinformatics, 2006, 22(13): 1623
+
+1630.
+ [IO1 Tomita E, Tanaka A, Takahashi H. The worst-case time complexity for generating   I maximal cliques and computational experiments. Theoretical Computer Science, 2006
+363(1):28-42
+ l102) Liu G, Wong L, Chua H N Complex discovery from weighted PPI networks. Bioinformatics,
+2009,25(15):1891-1897
+ [103 Friedel C C, Krumsiek J], Zimmer R. Bootstrapping the interactome: unsupervised identifi-
+ cation of protein complexes in yeast. Proceedings of Research in Computational Molecular
+ Biology. Springer, 2008. 3-16
+ 1104] Gavin A C, Aloy P, Grandi P, et al. Proteome survey reveals modularity of the yeast cell
+ machinery. Nature,2006,440(7084):631-636
+ [105] Komurov K, White M. Revealing static and dynamic modular architecture of the eukaryotic
+ protein Interaction network. Molecular Systems Biology, 2007, 3(1): 110
+ [106] Feng J, Jiang R, Jiang T. A max-flow-based approach to the identification of protein com-
+ plexes using protein interaction and microarray data. IEEE/ACM Transactions on Compu-   tational Biology and Bioinformatics(TCBB), 2011, 8(3): 621-634
+ [107] Gallo G. Grigoradis M D, Tarjan R E. A fast parametric maximum flow algorithm and
+ applications. SIAM Je   ournal on Computin  g,1989,18(1):30-55
+ [108 Maraziotis I A, Dimitrakopoulou K, Bezerianos A. Growing functional modules from a seed   protein via integration of protein interaction and gene expression data. BMC Bioinformatics  2007,8(1):1.
+
+  1109] Ulitsky I, Shamir R. Identification of functional modules using newwork topology and high   throughput data. BMC Systems Biology, 2007, 1(1): 1
+ 1 10) Lubovac Z, Gamalielsson J, Olsson B. Combining functional and topological properties to   identify core modules in protein interaction networks. Proteins: Structure, Function, and
+ Bioinformatics, 2006, 64(4): 948-959
+ /111] Cho Y R, Hwang W, Ramanathan M, et al. Semantic integration to identify overlapping   functional modules in protein interaction networks, BMC Bioinformatics, 2007, 8(1): 1 112) Hwang W, Cho Y R, Zhang A, et al. A novel functional module detection algorithm for
+ protein-protein interaction networks. Algorithms for Molecular Biology, 2006, 1(1): 1 X113)Kim P M, Lu L J, Xia Y, et al. Relating three-dimensional structures to protein networks
+ provides evolutionary insights. Science, 2006, 314(5807): 1938-1941
+ LI14 JUNG S, Jang W H, HUR H Y. Protein complex prediction based on mutually exclusive   interactions in protein interaction network. Genome Informatics, 2008, 21: 77-88
+ [115] Will T, Helms V. Identifying transcription factor complexes and their roles. Bioinformatics,
+2014,3017415421.
+ [116] Sharan R, Ideker T, Kelley B, et al. Identification of protein complexes by comparative   analysis of yeast and bacterial protein interaction data. Journal of Computational Biology.
+2005,12(6):835-846   [117] Dost B, Shlomi T, Gupta N, et al. QNet: a tool for querying protein interaction networks
+ Journal of Computational Biology, 2008, 15(7): 913-925   [I18) Alon N, Yuster R, Zwick U. Color-coding. Journal of the ACM (JACM), 1995, 42(4): 844-
+
+856   [119] Dutkowski J, Tiuryn J. Identification of functional modules from conserved ancestral   protein-protein interactions. Bioinformatics, 2007, 23(13): i149-i158   [120L Leung H C, Xiang Q, Yiu S M, et al. Predicting protein complexes from PPI data: a core   attachment approach. Journal of Computational Biology, 2009, 16(2): 133-144   [121] Wu M, Li X, K woh C K, et al. A core-attachment based method to detect protein complexes
+ in PPI networks. BMC Bioinformatics, 2009, 10(1): 1   (122) Kouhsar M, Zare-Mirakabad F, Jamali Y. WCOACH: Protein complex prediction in weight   ed PPI networks. Genes Genetic Systems, 2016, 90(5): 317-324   Wang J, Peng X, Peng W, et al. Dynamic protein interaction network construction and
+ applications. Proteomics, 2014, 14(4-5): 338-352   [124] Ou-Yang L, Dai D Q, Li X L, et al. Detecting temporal protein complexes from dynamic   protein-protein interaction networks. BMC Bioinformatics, 2014, 15(1): 335
+ (125) Qi Y, Balem F, Faloutsos C, et al. Protein complex identification by supervised graph local
+ clustering. Bioinformatics, 2008, 24(13): 1250-i268
+ /)/Shi L, Lei X, Zhang A. Protein complex detection with semi-supervised leaming in protein   interaction networks. Proteome Science, 2011, 9(1): 1
+
+  1193) Breiman L. Random forests. Machine Learning, 2001, 45(1): 5-32   1194) Mallapragada P K, Jin R, Jain A K, et al. Semiboost: Boosting for semi-supervised learnt   Pattern Analysis and Machine Intellgence, IEEE Transactions on. 2009. 31(11): 2000)-2014   (1951 Fischer T, Arunachalam K. Bailey D, et al. The binding interface database(BID. a compila   tion of amino acid hot spots in protein interfaces. Bioinformatics, 2003, 19(11) 1453-14S4   (196 Tong A H Y: Drees B, Nardelli G, et al. A combined experimental and computational strat.   egy to define protein interaction networks for peptide recognition modules. Science, 2002.
+295553321-324.   1197) Ashburner M Ball CA, Blake J A, et al. Gene Ontology: tool for the unification of biology   Nature Genetics, 2000, 25(1): 25-29   Wang J Z, Du Z, Payattakool R et al. A new method to measure the semantic similanity of   GO terms, Bioinformatics, 2007, 23(10): 1274-1281   (199) Von Luxburg U. A tutorial on spectral clustering. Statistics and Computing, 2001
+(4):395-416.   (200) Yu G, LiF. Qin Y et al. GOSemSim: an R package for measuring semantic similarity among   GO terms and gene products. Bioinformatics, 2010, 26(7): 976-978
+ (20I1 Krogan N J, Cagney G, Yu H, et al. Global landscape of protein complexes in the yeast   Saccharomyces cerevisiae. Nature, 2006. 440(7084): 637-643
+ (2021 Collins S R. Kemmeren P, Zhao X C, et al. Toward a comprehensive atlas of the physical in
+ teractome of Saccharomyces cerevisiae. Molecular Cellular Proteomics, 2007. 6(3)439.
+450.
+ (203) Mewes H W Amid C, Arnold R, et al. MIPS: analysis and annotation of proteins from whole
+ genomes. Nucleic Acids Research. 2004. 32(suppl 1): D41-D44
+ 1204)Pu S, Wong J, Turner B, et al. Up-to-date catalogues of yeast protein complexes, Nucleic
+ Acids Research, 2009. 37(3): 825-831
+ (205)Ruepp A, Zollner A. Maier D. et al. The FunCat, a functional annotation scheme for sys.
+ tematic classification of proteins from whole genomes. Nucleic Acids Research, 2004.
+32(18):5539-5545
+ (206) Enright A J, Van Dongen S, Ouzounis C A. An efficient algorithm for large-scale detection
+ of protein families, Nucleic Acids Research, 2002, 30(7): 1575-1584
+ 1207) Xu B. Guan J. From function to interaction: a new paradigm for accurately predicting protein   complexes based on protein-to-protein interaction networks. IEEE/ACM Transactions   Computational Biology and Bioinformatics (TCBB),2014. 11(4): 616-627   (208) Mobe/ F M, Zomer A, Jonge M I, et al. Advances and perspectives in computational pre-   diction of microbial gene essentiality. Briefings in Functional Genomics, 2016, 118(4):903-
+910
+ (209) Lin D. An information-theoretic definition of similarity. Proceedings of Fifteenth Intema-   tional Conference on Machine Learning, volume 98, 1998. 296-304

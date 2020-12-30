@@ -147,13 +147,13 @@ Tang等人\cite{tang_comparison_2011}设定阈值，将蛋白质基因表达数�
 \subsection{筛选框架实现流程}
 \label{subsection:motivationAndThinking:flow}
 
-复合物筛选模型框架设计如图\ref{fig:main-process}所示；
+复合物筛选模型框架设计如图\ref{fig:main-flow}所示；
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=14cm]{main-process}
+    \includegraphics[width=14cm]{main-flow}
     \caption{复合物筛选框架主体流程图}
-    \label{fig:main-process}
+    \label{fig:main-flow}
 \end{figure}
 
 首先依照\ref{section:featSubNetworkConstruct:allSample}提出的数据集构建方法，对每一个复合物网络可以得到一个由复合物子图构成的数据集。该数据集中每一个复合物子图有和标准复合物的邻居相似性评分，总体分为四类复合物，分别为标准复合物、高评分预测复合物、低评分预测复合物和随机复合物。

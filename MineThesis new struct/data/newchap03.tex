@@ -1,12 +1,7 @@
 \chapter{基于图卷积神经网络的复合物筛选模型}
 \label{chapter:NodeConv}
 
-\section{图卷积神经网络介绍}
-\label{section:NodeConv:intro}
-
-
-
-\section{模型提出}
+\section{引言}
 \label{section:NodeConv:Put}
 
 已有的基于监督学习的复合物预测算法，基本都是基于挖掘复合物子图的拓扑特征，比如图的密度、图的结点个数、平均度数等等，将图的所有拓扑特征置于一个向量中，构成一个$1\times N$的向量，用该向量代替子图，最后将向量用于训练分类模型。具体过程如图\ref{fig:entropy-classification}所示。
@@ -23,8 +18,13 @@
 
 为了解决该问题，在不引入额外的生物学信息的情况下，本文提出了基于全局特征的复合物分类模型。
 蛋白质复合物网络是一个高维结构，可以通过挖掘蛋白质在网络中所处的位置和其周围相互作用关系挖掘蛋白质的潜在特征表示，将网络的高维数据转换为蛋白质的低维嵌入表示，成为每一个蛋白质初始的特征向量。
+\section{图卷积神经网络介绍}
+\label{section:NodeConv:intro}
 
-\section{复合物子图中图卷积神经网络的实现}
+
+
+
+\section{基于图卷积神经网络的复合物筛选模型}
 \label{section:NodeConv:detail}
 
 本文使用了两种蛋白质特征嵌入模型，分别为Deepwalk和GAE。

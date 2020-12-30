@@ -1,18 +1,18 @@
 \chapter{基于消息传递网络的复合物筛选模型}
 \label{chapter:MPNN}
-
-\section{消息传递网络介绍}
-\label{section:MPNN:intro}
-
-\section{模型提出}
+\section{引言}
 \label{section:MPNN:Put}
 
 模型\ref{section:NodeConv:intro}和模型\ref{section:EdgeConv:intro}分别是结点嵌入和邻边嵌入模型，蛋白质复合物的形成和蛋白质以及蛋白质互作相关。
 普通的GCN模型只能将邻边特征转换为结点特征之后再进行图卷积运算，这个过程将邻边特征均匀的分配给了其相邻的结点，在模型训练过程中不再将邻边作为独立的计算元素。这种情形下，邻边特征只能作为结点特征的补充，无法与复合物互作网络动态的结合起来。
 
 为了将邻边特征与结点特征整合到模型的动态参数更新中，本节基于消息传递网络（Message Passing Neural Network，简称MPNN）提出蛋白质复合物特征融合模型，同时处理蛋白质复合物子图中的结点数据和邻边数据，将生物数据、全局拓扑特征以及局部拓扑特征动态的融合起来。
+\section{消息传递网络介绍}
+\label{section:MPNN:intro}
 
-\section{复合物子图中消息传递网络的实现}
+
+
+\section{基于消息传递网络的复合物筛选模型}
 \label{section:MPNN:detail}
 
 融合模型是基于MPNN网络的改进，MPNN网络是一种基于消息传递的图结构学习框架，不同于图卷积模型必须将特征绑定到结点，MPNN将图结构的特征当成消息，特征在结构中的流动被视为消息的传递。在此框架下，图卷积神经网络可以被当作MPNN的特例，是只传递结点消息的MPNN网络。

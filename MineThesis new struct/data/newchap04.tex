@@ -1,15 +1,15 @@
 \chapter{基于邻边卷积网络的复合物筛选模型}
 \label{chapter:EdgeConv}
-
-\section{邻边卷积网络介绍}
-\label{section:EdgeConv:intro}
-
-\section{模型提出}
+\section{引言}
 \label{section:EdgeConv:Put}
 
 已有方法已经充分表明，在PPI网络中进行蛋白质复合物预测不仅仅是一个图论中的聚簇发现问题，更是一个信息融合问题。无论是加权网络方法、核心附属结构预测方法，都致力于最大程度的利用生物学信息进行辅助预测。基于该前提，本文提出了基于生物特征的复合物预测模型。
+\section{邻边卷积网络介绍}
+\label{section:EdgeConv:intro}
 
-\section{复合物子图中邻边卷积网络的实现}
+
+
+\section{基于邻边卷积网络的复合物筛选模型}
 \label{section:EdgeConv:detail}
 
 本文处理了大量的生物学数据，包括蛋白质功能注释数据、结构域相互作用数据、亚细胞定位数据等，应用相关的生物邻域的处理方法将生物学数据转换为可应用的特征数据，最终得到了12维度的特征数据。所有的特征都描述蛋白质相互作用，因此在图结构中，这些特征编码为图结构邻边的特征。

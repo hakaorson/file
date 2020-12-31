@@ -1,7 +1,7 @@
 \chapter{蛋白质复合物特征子图样本生成}
 \label{chapter:featSubNetworkConstruct}
 
-本章主要介绍蛋白质复合物特征子图的生成，其中包括蛋白质相互作用网络构建、结点特征生成与嵌入、邻边特征生成与嵌入以及特征子图样本的提取。重点在于本章使用了深度学习方法、网络嵌入方法、多种邻边相似性特征提取方法构建具有丰富特征的蛋白质相互作用网络，并在此基础上构建了特征子图样本数据集。
+本章主要介绍蛋白质复合物特征子图的生成，其中包括蛋白质相互作用网络构建、结点特征生成与嵌入、邻边特征生成与嵌入以及特征子图样本的提取。重点在于本章使用了深度学习方法、网络嵌入方法、多种邻边相似性特征提取方法构建具有丰富特征的蛋白质相互作用网络，并在此基础上构建了特征子图样本数据集，包括正样本数据集、中间样本数据集、负样本数据集、待筛选样本数据集。
 
 \section{引言}
 \label{section:featSubNetworkConstruct:intro}
@@ -251,7 +251,7 @@ Skip-gram是一种词向量嵌入模型，基本思路是利用序列中的单�
     \caption{edgefeat嵌入示意图示意图}
     \label{fig:edgefeat/main}
 \end{figure}
-本文为蛋白质相互作用网络的所有邻边嵌入相同维度的特征，特征中相同标号的数据具有同样的生物学意义。本文为邻边嵌入的特征包括基于蛋白质GO功能注释相似性的特征
+本文为蛋白质相互作用网络的所有邻边嵌入相同维度的特征，特征中相同标号的数据具有同样的生物学意义。本文为邻边嵌入的特征包括基于蛋白质GO功能注释相似性的特征、基于蛋白质拓扑域相似性特征、基于蛋白质亚细胞定位相似性的特征和基于拓扑相似性的特征。下面分别介绍这四类相似性特征。
 
 \subsubsection{蛋白质GO功能注释相似性的邻边特征嵌入}
 
@@ -345,7 +345,7 @@ huang等人\cite{huang_protein-protein_2013}在运用结构域相互作用网络
 
 \subsubsection{蛋白质拓扑相似性的邻边特征嵌入}
 
-蛋白质在$PIN$中所处的拓扑环境也可以作为蛋白质相似性特征的计算方式。惭愧DPClus算法\cite{altaf-ul-amin_development_2006}，本文将结点的公共邻居数作为拓扑相似性特征。具体计算方法如下：
+蛋白质在$PIN$中所处的拓扑环境也可以作为蛋白质相似性特征的计算方式。基于DPClus算法\cite{altaf-ul-amin_development_2006}中提出的相似性计算方法，本文将结点的公共邻居数作为拓扑相似性特征。具体计算方法如下：
 \begin{equation}
     \label{equ:feat:topoCN}
     CN_{(P,Q)} = \left\lvert N_P\cap N_Q\right\rvert
@@ -372,26 +372,57 @@ huang等人\cite{huang_protein-protein_2013}在运用结构域相互作用网络
 \subsection{融合结点特征和邻边特征的蛋白质相互作用网络构建}
 \label{subsection:featPPINetwork:addFeat}
 
-嵌入了
+通过蛋白质相互作用数据集构造蛋白质相互作用网络，再在网络的基础上应用多种结点嵌入方法和邻边嵌入方法为网络添加结点特征和邻边特征，其工程如图\ref{fig:featedgraph}所示，其中的小矩形代表某一个元素的特征向量，橘色为结点特征向量，蓝色的邻边特征向量。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=14cm]{featedgraph}
+    \caption{结点和邻边特征嵌入示意图}
+    \label{fig:featedgraph}
+\end{figure}
+
 
 \section{训练和待筛选复合物特征子图样本生成}
 \label{section:featSubNetworkConstruct:allSample}
 
-在$Feated-PIN$的基础上，按照复合物的对应结点抽取局部图$Feated-subGraph$，该局部图包含了复合物内部蛋白质之间的相互作用关系、相关性特征数据及部分蛋白质特征数据，因此可以将局部图作为后续复合物筛选模型的输入数据。
+在$Feated-PIN$的基础上，按照复合物的对应结点抽取局部图$Feated-subGraph$，该局部图包含了复合物内部蛋白质之间的相互作用关系、相关性特征数据及部分蛋白质特征数据，因此可以将局部图作为后续复合物筛选模型的输入数据。该局部子图的示意图如下所示。
 
-本文正样本由酵母菌标准复合物数据集CYC2008\cite{pu_up--date_2009}和MIPS\cite{pagel_mips_2005}构成，负样本为$PIN$上在一定限制条件下产生的随机子图。COACH算法\cite{leung_predicting_2009}作为在复合物预测方法中具有一定准确度和鲁棒性的方法，其产生的样本作为中间样本。
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=14cm]{extract}
+    \caption{复合物子图样本的构造示意图}
+    \label{fig:extract}
+\end{figure}
+在图中，左侧为整个蛋白质相互作用网络，结点$\{A,D,E,H,J\}$为某一个蛋白质复合物的蛋白质集合对应的结点，在获取局部子图的过程中，首先保留结点集合$\{A,D,E,H,J\}$及其结点特征，然后保留结点集合之中的相互作用关系，如邻边$H,J$等。最后形成蛋白质复合物对应的具有结点特征和邻边特征的子图。
+
+本文正样本由酵母菌标准复合物数据集CYC2008\cite{pu_up--date_2009}和MIPS\cite{pagel_mips_2005}构成，负样本为$PIN$上在一定限制条件下产生的随机子图。COACH算法\cite{leung_predicting_2009}作为在复合物预测方法中具有一定准确度和鲁棒性的方法，其产生的样本作为中间样本。待筛选样本为Dpclus算法、Clique算法和IPCA算法在蛋白质复合物网络中的预测结果对应的样本。
 
 
 \subsection{正样本数据——基于已知蛋白质复合物融合}
 \label{subsection:allSample:positiveSampleData}
 
-本文融合了CYC2008和MIPS数据集，剔除了其中邻居相似性（公式\ref{equ:compComplexSim:NA}）过高的部分，剩余的样本数为734。
-在PPI网络中，可能存在部分结点缺失，为了保证标准复合物的准确性，在训练过程中我们舍弃具有缺失的标准复合物。具体数据为在Biogrid网络中，正样本个数为621个，在DIP网络中，正样本个数为371。
+蛋白质复合物数据集通常是由单独的研究机构或学校维护，会每隔一段时间更新生物学上已发现的蛋白质复合物。其中CYC2008数据集和MIPS数据集是针对酿酒酵母的蛋白质复合物数据集，且蛋白质复合物数量较多，更新较快，因此本文采用了CYC2008和MIPS数据集作为标准数据集。
+
+为了训练统一的能够识别真正蛋白质复合物的模型，需要将已知的蛋白质复合物做融合，成为统一的正样本数据。由于不同的正样本数据集可能产生高度相似甚至相同的蛋白质复合物，为了保证样本的独立性，本文做了冗余数据的提出处理。
+
+本文以此对比了每一对蛋白质复合物并计算其邻居相似性，邻居相似性的计算方法如公式\ref{equ:compComplexSim:NA}所示，邻居相似性代表了两个蛋白质复合物的重合程度。参考已有方法，当两个复合物邻居相似性高于0.8时，本文剔除其中结点数较低的复合物，从而保证最终的正样本集合中无相似样本，具有一定的独立性。最终形成了734个样本的蛋白质复合物数据集。
+
+\begin{equation}
+    \label{equ:compComplexSim:NA}
+    NA_{(\mathcal{P} ,\mathcal{Q} )} = \frac{{\left\lvert V_{\mathcal{P}} \cap V_{\mathcal{Q}}\right\rvert}^2 }{{\left\lvert V_{\mathcal{P}} \right\rvert}\cdot  {\left\lvert V_{\mathcal{Q}} \right\rvert}}
+\end{equation}
+其中$\mathcal{P}=(V_{\mathcal{P}} ,E_{\mathcal{P}})$和$\mathcal{Q}=(V_{\mathcal{Q}} ,E_{\mathcal{Q}})$是均表示蛋白质复合物，$V_{\mathcal{P}}$为复合物中的结点集合，$E_{\mathcal{P}}$为复合物中的相互作用集合。
+
+在PPI网络中，由于标准复合物数据集和复合物相互作用数据集可能存在不一致性，部分结点标准复合物数据集存在而互作网络中不存在，为了保证标准复合物的准确性，在抽取子图的过程中，本文会舍弃其中映射到$PIN$网络中出现结点缺失的复合物。
+
+经过上述操作，为在Biogrid网络中剔除结点缺失的样本之后最终的正样本子图数据个数为621个，在DIP网络中剔除结点缺失的样本之后最终的正样本子图数据个数为371个。
 
 \subsection{中间样本数据——基于COACH算法}
 \label{subsection:allSample:middleSampleData}
 
-中间样本由无权COACH算法运行在目标网络中产生，需要对标准复合物和随机复合物具有一定的区分度，同时能对分类器识别复合物具有指导作用。一般情况下，通常复合物预测算法无法无法得到和标准集中的复合物完全相同的结果，在邻居相似性大于0.25时就认为复合物预测成功。
+COACH算法是一种基于密集子图发现的蛋白质复合物预测算法，可以直接在无权$PIN$网络中预测的蛋白质复合物样本。该方法算法性能优良，且在多个已知的相互作用网络数据集中预测之后，预测结果的召回率和准确率均有较高的数值，其预测的复合物具有一定的指导性，因此本文将COACH算法的预测结果作为独立的中间样本数据。中间样本数据对标准复合物和随机复合物具有一定的区分度，能对分类器识别复合物具有指导作用。
+
+一般情况下，通常复合物预测算法无法无法得到和标准集中的复合物完全重合的结果。当预测的某一个复合物其和标准复合物的最大邻居相似性大于0.25时就认为复合物预测成功。
 
 依据基于邻居相似性的分类标准，COACH生成的样本中有部分复合物预测成功，剩余的复合物预测失败，本文对分类模型的要求时可以区分这两类样本。在可区分该两类样本的情况下，模型对其他算法产生的结果进行筛选时，才可以正确的定位到其中预测成功的样本。因此本文将COACH生成的样本分为两类。
 由于邻居相似性处于0.25附近时，样本可能具有较大的迷惑性，反而影响模型的正常训练，因此剔除相似性在0.25附近的部分样本。
@@ -434,14 +465,22 @@ huang等人\cite{huang_protein-protein_2013}在运用结构域相互作用网络
 
 \subsection{待筛选样本数据——基于核心附属的蛋白质复合物预测算法}
 \label{subsection:allSample:coreAttachSampleData}
+
+待筛选样本是用于测试模型有效性的测试样本，由已有的复合物预测算法产生。本文采用了基于核心附属的蛋白质复合物预测算法，包括Dpclus算法、Clique算法和IPCA算法，该类算法均具有较高的复合物样本产生量，其召回率的评价指标较高，具有较高的可优化空间。
+
+分别在DIP和Biogrid蛋白质相互作用网络中使用运行复合物预测算法，其得到的预测结果统计如\label{subsection:allSample:summary}部分所示。
+
+
+
+
 \subsection{数据汇总与分析}
 \label{subsection:allSample:summary}
 
-最终产生的整体结果如下表所示：
+最终产生的训练数据集如下表所示：
 
 \begin{table}[h]
     \centering
-    \caption{数据集分布统计表}
+    \caption{训练数据集分布统计表}
     \label{tab:datasets:statistic}
     \begin{tabular}{C{3cm}C{2cm}C{3cm}C{3cm}C{2cm}}
         \toprule
@@ -453,7 +492,24 @@ huang等人\cite{huang_protein-protein_2013}在运用结构域相互作用网络
     \end{tabular}
 \end{table}
 
+最终产生的待筛选数据集如下表所示：
+
+\begin{table}[h]
+    \centering
+    \caption{待筛选数据集分布统计表}
+    \label{tab:datasets:statistic}
+    \begin{tabular}{C{3cm}C{2cm}C{3cm}C{3cm}C{2cm}}
+        \toprule
+        \textbf{网络} & \textbf{Dpclus算法} & \textbf{Clique算法} & \textbf{IPCA算法} \\
+        \midrule
+        Krogan数据集  & 1178                & 3224                & 840               \\
+        DIP数据集     & 1078                & 6250                & 438               \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 
 \section{本章小结}
 \label{section:FeatSubNetworkConstruct:summary}
+
+本章主要介绍了蛋白质复合物特征子图的生成过程，主要分为两个阶段完成了这个过程。第一阶段是特征蛋白质相互作用网络的构建，其中包括蛋白质相互作用网络构建、结点特征生成与嵌入、邻边特征生成与嵌入。介绍了Deepwalk和GAE为基础的结点特征嵌入方法、介绍了多种基于蛋白质相似性的邻边特征嵌入方法。后续阐述了如何在特征蛋白质相互作用网络基础上上构建了特征子图样本数据集。

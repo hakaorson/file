@@ -16,13 +16,9 @@
 
 但是蛋白质复合物中，有大部分复合物是小尺度复合物，其蛋白质个数小于5个。此类复合物的拓扑结构结构简单，提取的拓扑特征具有趋同性。随机的子图在结点数较少的情况下可能形成相同的拓扑特征，此时分类模型无法区分子图是否为真正的复合物。
 
-为了解决该问题，在不引入额外的生物学信息的情况下，本文提出了基于全局特征的复合物分类模型。
 蛋白质复合物网络是一个高维结构，可以通过挖掘蛋白质在网络中所处的位置和其周围相互作用关系挖掘蛋白质的潜在特征表示，将网络的高维数据转换为蛋白质的低维嵌入表示，成为每一个蛋白质初始的特征向量。
-\section{图卷积神经网络介绍}
-\label{section:NodeConv:intro}
 
-
-
+在不引入额外的生物学信息的情况下，本文提出了基于结点的全局拓扑特征的复合物局部子图分类模型。该模型仅使用网络的拓扑特征，利用图卷积神经网络在将拓扑信息与局部子图相互融合，最终得到局部子图的总体特征并做相应的分类与回归处理。
 
 \section{基于图卷积神经网络的复合物筛选模型}
 \label{section:NodeConv:detail}
@@ -67,7 +63,7 @@
 其中，$PL$为预测类别，$TL$为真实类别，$PS$为预测评分，$TS$为真实评分，$\alpha$为损失平衡系数。
 
 模型测试阶段，本文将复合物生成算法A在$PIN$网络中运行得到算法A预测的复合物$Complexes_A$，用腹黑谁分类模型筛选所有预测结果，其中如果预测样本在筛选模型中被分类为真样本或者评分高于0.25时，预测样本即可通过筛选。最后所有通过筛选的复合物形成复合物集合$Complexes_A'$。最后使用F1值和PPV指标评估$Complexes_A$和$Complexes_A'$的复合物质量。
-评价复合物预测结果的常用指标为精准率（precision）、召回率（recall）和F1值（F1-score）。预测复合物和标准复合物计算邻居相似性（NA-similarity）\ref{equ:compComplexSim:NA}，计算方式如下所示。
+评价复合物预测结果的常用指标为精准率（precision）、召回率（recall）和F1值（F1-score）。预测复合物和标准复合物计算邻居相似性（NA-similarity）\ref{equ:compComplexSim:NA}。
 \begin{equation}
     \label{equ:compComplexSim:NA}
     NA_{(\mathcal{P} ,\mathcal{Q} )} = \frac{{\left\lvert V_{\mathcal{P}} \cap V_{\mathcal{Q}}\right\rvert}^2 }{{\left\lvert V_{\mathcal{P}} \right\rvert}\cdot  {\left\lvert V_{\mathcal{Q}} \right\rvert}}

@@ -23,28 +23,49 @@
 \section{基于图卷积神经网络的复合物筛选模型}
 \label{section:NodeConv:detail}
 
-本文使用了两种蛋白质特征嵌入模型，分别为Deepwalk和GAE。
+本文在\ref{subsection:featPPINetwork:nodeFeatConstruct}部分简单介绍了图卷积神经网络。本节介绍在基于图卷积神经网络的复合物筛选模型中单一图卷积网络的计算方法。
 
+在单一的卷积层中，结点特征的计算方法如下图所示。
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=10cm]{GCN/nodeupdate}
+    \caption{结点更新过程中数据流程示意图}
+    \label{fig:GCN/nodeupdate}
+\end{figure}
+如图中所示，结点A的特征将有结点$\{A,D,E,H,J\}$共同确定，图中左侧为未更新状态，右侧为更新结点特征过程中的数据流动。其具体过程可以表示为如下的公式。
+\begin{equation}
+    \label{equ:loss}
+    h_i^{(l+1)} = \sigma(b^{(l)} + \sum_{j\in\mathcal{N}(i)}\frac{1}{c_{ij}}h_j^{(l)}W^{(l)})
+\end{equation}
+其中$\mathcal{N}(i)$表示结点i的所有邻居，${c_{ij}}$表示结点i和结点j度乘积的平方根，其具体计算为$c_{ij} = \sqrt{|\mathcal{N}(i)|}\sqrt{|\mathcal{N}(j)|}$，$\sigma$表示激活函数，$b^{(l)}$表示卷积过程中的偏移值。
 
+在模型中，偏移值设置为0，激活函数为Relu函数。而在卷积过程中，为了保持结点特征的连续性，每一个子图的结点均添加一条自环，从式中可以得出，添加自环之后，结点特征更新过程中会有一部分信息由自身提供。
 
+上式为单个结点的更新过程，将子图中所有结点更新一轮之后即完成一层图卷积过程，图中结点特征从第l层更新到第l+1层。
 
 \section{算法具体实现与流程}
 \label{section:NodeConv:flow}
 
+下面从数据流的层面阐述从特征子图数据到样本评价数据的实现流程。
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=14cm]{node-classification-flow}
-    \caption{基于全局特征的分类模型总体流程}
-    \label{fig:node-classification-flow}
+    \includegraphics[width=14cm]{GCN/flow}
+    \caption{基于图卷积神经网络的复合物筛选模型总体流程}
+    \label{fig:GCN/flow}
 \end{figure}
-基于全局特征的复合物分类模型总体结构如图\ref{fig:node-classification-flow}所示。基于Deepwalk和GAE编码，蛋白质嵌入特征维度总共80维，在$PIN$中加入嵌入特征之后，蛋白质复合物子图具备了初始的结点特征向量。图卷积神经网络\ref{section:NodeConv:intro}具有动态融合结点特征和拓扑结构的能力，已经广泛应用于图任务中。
-初始嵌入的80维特征是整个$PIN$网络中结点特征的描述，但是还未结合蛋白质复合物子图的拓扑关系。因此，本文在后续的图分类任务中加上了两层GCN网络对蛋白质结点特征和子图拓扑结构进行融合，增加蛋白质结点特征对复合物内部蛋白质互作关系的描述能力。
-最终基于全局特征的复合物分类模型对子图的蛋白质结点特征做平均池化，作为蛋白质复合物特征的输出，以多层感知器预测复合物的分类结果。
+
+基于全局特征的复合物分类模型总体结构如图\ref{fig:GCN/flow}所示。模型的初始输入特征结点特征，维度为80维，其中包括基于Deepwalk嵌入特征64维和GAE嵌入特征16维。
+
+在初始特征之后加入了两层图卷积模型，图卷积模型如上节所示，可以融合图中结点特征和拓扑结构对结点特征进行更新。图卷积过程中隐层维度设置为64维。两层图卷积之后，采用了对结点特征Maxpool和MeanPool的池化方法。两种池化方法的结果进行拼接之后，形成的128维的特征代表图整体特征。后续分别为两层感知器和softmax层得到图的分类预测，两层感知器和sigmoid层得到图的评分预测。
+分类指标和评分将作为蛋白质复合物的综合评价指标，具体计算方法如\ref{section:NodeConv:allExperienceDesign}中损失函数计算部分所示。
+
 
 \section{实验参数与评估指标}
 \label{section:NodeConv:allExperienceDesign}
 由于训练数据的不平衡性，训练模型之前，数据进行了重采样处理，保持各分类训练样本相等。按照$8:2$的比率分割各分类样本，形成训练集和测试集。在分类模型的训练过程中，观察训练集和测试集的损失函数，根据早停策略得到未过拟合最佳模型。
+由于各项特征数据存在不平衡性，部分数据如蛋白质长度等数值过大，本文将所有的特征数据进行了统一的归一化和标准化处理。
+
 本文采用0.001的学习率，batch大小设置为32，隐层维度为128，模型使用了两层的GCN网络以及两层的分类器。
 采用LeakyRelu\ref{fig:leakyrelu}作为激活函数和AdamOptimism作为模型优化器。
 
@@ -177,3 +198,5 @@ Acc值综合考虑了Sn值和PPV值的结果，能更全面的反应预测复合
 
 \section{本章小结}
 \label{section:NodeConv:summary}
+
+本章基于拓扑结构出发，探讨了仅仅使用拓扑结构数据的基础上，复合物筛选模型可达到的效果提升。提出了利用GAE和Deepwalk特征基于图卷积神经网络的蛋白质复合物子图评分模型，阐述了单层卷积过程以及整体模型的结构。同时本章介绍了本文通用性的实验参数、基础以及评价指标，后续不再做更多介绍。最后本章在基础模型，无特征模型上进行了实验，实验结果表明特征的有效性以及卷积融合结点特征后评价指标达到了最优结果。

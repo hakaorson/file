@@ -34,16 +34,14 @@ Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并
 \begin{figure}[htbp]
     \centering
     \subcaptionbox{DIP数据集}{\label{fig:ppi:zitu:a}
-        \includegraphics[width=9cm]{ppi-dip}}
-    \vskip0.5cm
+        \includegraphics[width=5cm]{PPI/DIP.png}}
     \subcaptionbox{Krogan数据集}{\label{fig:ppi:zitu:b}
-        \includegraphics[width=9cm]{ppi-krogan}}
+        \includegraphics[width=5cm]{PPI/Krogan.png}}
     \vskip0.5cm
-    \subcaptionbox{biogrid数据集}{\label{fig:ppi:zitu:c}
-        \includegraphics[width=9cm]{ppi-biogrid}}
-    \vskip0.5cm
+    \subcaptionbox{Biogrid数据集}{\label{fig:ppi:zitu:c}
+        \includegraphics[width=5cm]{PPI/Biogrid.png}}
     \subcaptionbox{Gavin数据集}{\label{fig:ppi:zitu:d}
-        \includegraphics[width=9cm]{ppi-gavin}}
+        \includegraphics[width=5cm]{PPI/Gavin.png}}
     \caption{蛋白质相互作用数据集}
     \label{fig:ppi-datasets}
 \end{figure}
@@ -72,11 +70,11 @@ Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并
 
 从表\ref{tab:PPIStatic}中可以看出，DIP数据集和Biogrid数据集是结点数和邻边数最大的两个数据集，同时其度数差异性较大，本文的研究工作主要围绕这两个数据集展开。最后，本文得出的模型效果也会在Krogan数据集和Gavin数据集进行验证。
 
-利用$PPI$数据集构建相应的$PIN$网络结构之后，可以将蛋白质特征以及蛋白质相互作用特征添加到网络中去，形成带有生物特征的蛋白质相互作用网络$Feated-PIN$。在蛋白质相互作用网络结点上添加蛋白质自有特征和嵌入特征作为结点的初始特征。蛋白质自有特征包括蛋白质序列长度、分子重量特征，蛋白质嵌入特征包括图自编码器器（Graph Auto Encoding，简称GAE）和结点嵌入模型（Node2Vec）得到的图嵌入特征。在蛋白质相互作用网络邻边上添加通过生物计算的蛋白质相互作用特征，包括蛋白质功能注释特征、拓扑域相似性特征和亚细胞定位相似性特征，以及蛋白质拓扑域相似性特征作为图网络里面邻边的初始特征。
+利用$PPI$数据集构建相应的$PIN$网络结构之后，可以将蛋白质特征以及蛋白质相互作用特征添加到网络中去，形成带有生物特征的蛋白质相互作用网络$Feated-PIN$。在蛋白质相互作用网络结点上添加蛋白质自有特征和嵌入特征作为结点的初始特征。蛋白质自有特征包括蛋白质序列长度、分子重量特征，蛋白质嵌入特征包括图自编码器器（Graph Auto Encoding，简称GAE）和结点嵌入模型（Node2Vec）中的深度随机游走方法（Deepwalk）得到的图嵌入特征。在蛋白质相互作用网络邻边上添加通过生物计算的蛋白质相互作用特征，包括蛋白质功能注释特征、拓扑域相似性特征和亚细胞定位相似性特征，以及蛋白质拓扑域相似性特征作为图网络里面邻边的初始特征。
 
 下面分别介绍结点特征的嵌入方法和邻边特征的嵌入方法。
 
-\subsection{基于GAE和Deepwalk的结点特征嵌入}
+\subsection{基于图自编码器器和深度随机游走的结点特征嵌入}
 \label{subsection:featPPINetwork:nodeFeatConstruct}
 
 图结构是高维的复杂的数据，包含噪声和冗余信息，直接的图结构数据无法应用于机器学习或数据分析任务中。结点特征嵌入就是将网络数据映射到低维空间中，从而学习到网络节点的低维向量表示，低维向量的长度一般为固定值，远小于网络的结点数量。在低维表示下，可以应用丰富的数据分析方法进行进一步处理，比如结点分类、链路预测、图分类等等。
@@ -85,14 +83,14 @@ Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=10cm]{node-vec.png}
+    \includegraphics[width=6cm]{node-vec.png}
     \caption{结点特征嵌入示意图}
     \label{fig:node-vec}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=10cm]{node-embedding}
+    \includegraphics[width=8cm]{node-embedding}
     \caption{结点特征嵌入映射到二维平面示意图}
     \label{fig:node-embedding}
 \end{figure}
@@ -108,7 +106,7 @@ Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并
 
 下面分别对图卷积神经网络、自编码器以及图自编码器做简单介绍，后续介绍基于图自编码器的蛋白质互作网络结点嵌入模型。
 
-\subparagraph{图卷积神经网络}
+\subparagraph{1)~图卷积神经网络} ~
 
 卷积神经网络快速发展，其具有高效的特征提取能力。相比传统方法，卷积神经网络给图像处理和自然语言处理等领域带来了空间的提升，如机器翻译、图像识别和语音识别等。但是传统的卷积神经网络只能处理欧氏空间数据，欧式空间数据具有平移不变性，其定义的全局共享的卷积核可以处理所有的数据点，如图像数据中，图片转换为像素点，任意像素点为中心都可以按同样的卷积核提取周围的信息。
 
@@ -130,13 +128,13 @@ Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并
     \label{fig:GCN/main}
 \end{figure}
 
-\subparagraph{自编码器}
+\subparagraph{2)~自编码器} ~
 
 自编码器（Auto Encoder）是无监督模型，由编码器和解码器两部分构成。编码器的任务是将原始的输入数据转换为编码数据表示，类似于数据压缩数据或者特征提取过程。解码器是将编码器得到的数据重新还原成原始的输入数据。自编码器的训练目标是使最终输出数据和原始输入数据之间的误差尽量小。基于该目标，自编码器的中间层编码数据具有复原输入的能力，可以认为这种编码数据表示有效地提取到了原始数据的特征。通常情况下，编码数据较原始数据维度低，具有一定的数据降维能力，同时也能去除数据中的噪声，有效提高数据的可用性。
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=14cm]{gae/autoencoder}
+    \includegraphics[width=9cm]{gae/autoencoder}
     \caption{自编码器示意图}
     \label{fig:gae/autoencoder}
 \end{figure}
@@ -148,7 +146,7 @@ Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并
     \varDelta X={\| X^\prime - X \Vert}
 \end{equation}
 
-\subparagraph{图自编码器}
+\subparagraph{3)~图自编码器} ~
 
 图自编码器是结合了图卷积神经网络和自编码器的一种用于处理图结构数据的深度神经网络。其具体过程如图\ref{fig:gae/main}表示，其目标是对图结构进行编码，得到结点的特征表示。
 
@@ -162,7 +160,7 @@ Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并
 \end{figure}
 
 
-\subparagraph{基于图自编码器的蛋白质互作网络结点嵌入模型}
+\subparagraph{4)~基于图自编码器的蛋白质互作网络结点嵌入模型} ~
 
 本节介绍在蛋白质互作网络上基于图自编码器的结点嵌入模型。
 
@@ -174,7 +172,7 @@ Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=10cm]{gae/mygae}
+    \includegraphics[width=15cm]{gae/mygae}
     \caption{基于图自编码器的蛋白质互作网络结点嵌入模型}
     \label{fig:gae/mygae}
 \end{figure}
@@ -192,14 +190,41 @@ Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并
 损失函数为预测的$PIN$邻接矩阵$A^{\prime}$和真实邻接矩阵$A$的MSELoss（Mean Square Error Loss）。
 
 \begin{equation}
-    \label{equ:decoder}
-    \quad l_n = \left( A^{\prime} - A \right)^2
+    \label{equ:autoembedloss}
+    \quad l_n =\frac{\sum_{e_{ij}\in G}{  \left( A_{ij}^{\prime} - A_{ij} \right)^2}}{n^2}
 \end{equation}
+其中G代表图结构，$e_{ij}$代表图结构中i结点和j结点连边，而$A_{ij}^{\prime}$为预测的边权重，$A_{ij}$为原始图中真实的边权重，如果原始图中邻边不存在，权重为0。
 
 
-训练过程的其他训练细节如下所示。训练过程中采用了Adam优化器，学习率为0.01，模型训练轮数为80轮。
+训练过程的其他训练细节如下所示。训练过程中采用了Adam优化器，学习率为0.01，模型训练轮数为80epoch。
 
 最终基于图自编码器的蛋白质互作网络结点嵌入模型采用最后一轮的隐层作为最终的结点嵌入，最终的结点嵌入结果为$\mathbb{R}^{n\times 16}$的特征矩阵。
+
+具体算法如下所示。
+\begin{algorithm}[h]
+    \caption{Graph Auto-Embedding in PIN} % 名称
+    \label{alg::gae}
+    \begin{algorithmic}
+        \Require
+        $G$: PIN graph struct data;
+        $A$: adjacent matrix of $G$;
+        $i$: epoch index;
+        $Dec$: Multi-layer perceptifier;
+        \Ensure
+        $F$: $\mathbb{R}^{n\times 16}$ node feat after GAE Process;
+        \State initial nodefeat=1, $F_0$;initial i=0;
+        \Repeat
+        \State compute hidden feat 1, $F_1=GCN(G,F_0)$;
+        \State compute hidden feat 2, $F_2=GCN(G,F_1)$;
+        \State compute hidden feat 3, $F_3=GCN(G,F_1)$;
+        \State reconstruct graph, $A^{\prime}=Dec(F_3)$;
+        \State compute loss, $L=MSELoss(A^{\prime},A)$;
+        \State optimization, $Adam(L)$;
+        \State i=i+1;
+        \Until{$i=80$}
+        \State extract node feats to $F$, $F$=$F_3$;
+    \end{algorithmic}
+\end{algorithm}
 
 \subsubsection{基于Deepwalk的结点特征嵌入}
 
@@ -220,16 +245,22 @@ Skip-gram是一种词向量嵌入模型，基本思路是利用序列中的单�
 
 \subsubsection{基于蛋白质自有特征的结点特征嵌入}
 
-在细胞中，蛋白质可以由一系列氨基酸构成，基于氨基酸序列本文获取了部分蛋白质特征特征，分别为氨基酸序列的长度和蛋白质的重量。
+在细胞中，蛋白质可以由一系列氨基酸构成，基于氨基酸序列本文获取了部分蛋白质特征，分别为氨基酸序列的长度和蛋白质的重量。
 
-其中氨基酸长度可以代表由氨基酸生成该蛋白质的困难程度，需要多少个氨基酸才能组合成该蛋白质。而蛋白质的重量一定程序上反应了生成该蛋白质消耗的元素量。在一定程度上能反应蛋白质的重要程度。本文采用了蛋白质的序列长度和质量两项特征作为蛋白质的自有特征。
+其中氨基酸长度可以代表由氨基酸生成该蛋白质的困难程度，需要多少个氨基酸才能组合成该蛋白质。而蛋白质的重量一定程度上反映了生成该蛋白质消耗的元素量，体现了蛋白质重要程度。本文采用了蛋白质的序列长度和质量两项特征作为蛋白质的自有特征。
 
 \subsubsection{结点特征嵌入汇总}
-在结点特征嵌入阶段，计算了$PIN$中蛋白质的GAE嵌入特征、Deepwalk嵌入特征以及蛋白质的自有特征。$PIN$中每个结点特征嵌入维度为86维，具体分布如表\ref{tab:PINedgeFeatNUms}所示：
+在结点特征嵌入阶段，计算了$PIN$中蛋白质的GAE嵌入特征、Deepwalk嵌入特征以及蛋白质的自有特征。$PIN$中每个结点特征嵌入维度为82维，其计算公式如\ref{equ:feat:nodecat}所示，具体分布如表\ref{tab:PINedgeFeatNums}所示：
+\begin{equation}
+    \label{equ:feat:nodecat}
+    F_i=Concat(F_i^{GAE},F_i^{Deepwalk},F_i^{Self})
+\end{equation}
+其中$i$表示第i个结点，$Concat$为特征拼接函数，$F_i$为第i个结点融合之后的82维特征，$F_i^{GAE}$为基于GAE得到的16维结点特征，$F_i^{Deepwalk}$为基于Deepwalk得到的64维结点特征，$F_i^{Self}$为基于蛋白质自有数据得到的2维结点特征。
+
 \begin{table}[h]
     \centering
     \caption{$PIN$结点特征维度分布}
-    \label{tab:PINedgeFeatNUms}
+    \label{tab:PINNodeFeatNums}
     \begin{tabular}{C{3cm}C{5cm}C{3cm}}
         \toprule
         \textbf{GAE嵌入特征} & \textbf{Deepwalk嵌入特征} & \textbf{结点自有特征} \\
@@ -242,20 +273,20 @@ Skip-gram是一种词向量嵌入模型，基本思路是利用序列中的单�
 \subsection{基于多种相似性计算方法的邻边特征嵌入}
 \label{subsection:featPPINetwork:edgeFeatConstruct}
 
-除了蛋白质的结点特征，蛋白质之间也存在复杂的相互所有关系，不同的相互作用关系由于作用的蛋白质结构域不同，功能不同，发生作用的生理位置不同等，具有很大的差异性。在一般的方法中，这部分差异性仅仅映射在作用强度一个单一的数值中，在本文中，将这种丰富的作用差异作为邻边的特征完整的嵌入到图结构中，如图{fig:edgefeat/main}所示。
+除了蛋白质的结点特征，蛋白质之间也存在复杂的相互所有关系，不同的相互作用关系由于作用的蛋白质结构域不同、功能不同、发生作用的生理位置不同等，具有很大的差异性。在一般的方法中，这部分差异性仅仅映射在作用强度一个单一的数值中，在本文中，将这种丰富的作用差异作为邻边的特征完整的嵌入到图结构中，如图\ref{fig:edgefeat/main}所示。
 
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=10cm]{edgefeat/main}
-    \caption{edgefeat嵌入示意图示意图}
+    \caption{edgefeat嵌入示意图}
     \label{fig:edgefeat/main}
 \end{figure}
 本文为蛋白质相互作用网络的所有邻边嵌入相同维度的特征，特征中相同标号的数据具有同样的生物学意义。本文为邻边嵌入的特征包括基于蛋白质GO功能注释相似性的特征、基于蛋白质拓扑域相似性特征、基于蛋白质亚细胞定位相似性的特征和基于拓扑相似性的特征。下面分别介绍这四类相似性特征。
 
 \subsubsection{蛋白质GO功能注释相似性的邻边特征嵌入}
 
-基因本体信息\cite{ashburner_gene_2000}即GO注释信息是描述蛋白质功能表达的词汇表，将生物活动过程进行统一编码表示，其在生物信息学邻域得到了广泛的应用。对应到蛋白质中，蛋白质分子参与的若干生物过程均可对应到GO注释表，形成对该蛋白质的综合功能描述。GO注释项总体分为三类，分别是生物过程（Biological Process）、分子功能（Molecular Function）及细胞组成（Cellular Component），生物过程描述分子功能有序组成的生命活动，分子功能描述分子在生物学上的活性，细胞组成描述了亚细胞结构及位置信息。GO注释项之间由于描述涵盖范围的不同，具有一定的从属关系，所有的GO注释项可以组成有向无环图（Directed Acyclic Graph，简称DAG）。图\ref{fig:go-dag}为QuickGO\cite{binns_quickgo_2009}网站中获取的生殖细胞发育过程对应的GO注释DAG图。GO注释信息的从属关系主要分为两种，分别是$is\_a$和$part\_of$，其中$is\_a$表示包含关系，如图中黑色箭头所示，$part\_of$表示从属关系，如图中蓝色箭头所示。图中每一个方框展示了GO注释项及其生物功能。
+基因本体信息\cite{ashburner_gene_2000}即GO注释信息是描述蛋白质功能表达的词汇表，将生物活动过程进行统一编码表示，其在生物信息学领域得到了广泛的应用。对应到蛋白质中，蛋白质分子参与的若干生物过程均可对应到GO注释表，形成对该蛋白质的综合功能描述。GO注释项总体分为三类，分别是生物过程（Biological Process）、分子功能（Molecular Function）及细胞组成（Cellular Component），生物过程描述分子功能有序组成的生命活动，分子功能描述分子在生物学上的活性，细胞组成描述了亚细胞结构及位置信息。GO注释项之间由于描述涵盖范围的不同，具有一定的从属关系，所有的GO注释项可以组成有向无环图（Directed Acyclic Graph，简称DAG）。图\ref{fig:go-dag}为QuickGO\cite{binns_quickgo_2009}网站中获取的生殖细胞发育过程对应的GO注释DAG图。GO注释信息的从属关系主要分为两种，分别是$is\_a$和$part\_of$，其中$is\_a$表示包含关系，如图中黑色箭头所示，$part\_of$表示从属关系，如图中蓝色箭头所示。图中每一个方框展示了GO注释项及其生物功能。
 \begin{figure}[htbp]
     \centering
     \includegraphics{go-dag}
@@ -324,21 +355,21 @@ Skip-gram是一种词向量嵌入模型，基本思路是利用序列中的单�
 \end{equation}
 其中$i$、$j$分别时蛋白质$p$、$q$之间的结构域，$Weight_{ij}$代表结构域$i$、$j$在结构域相互作用网络中的作用强度，对于无权网络可以取值为1。
 
-huang等人\cite{huang_protein-protein_2013}在运用结构域相互作用网络预测蛋白质相互作用时，提出了使用一阶邻居和二阶邻居计算$domain$相似性的想法，其扩展方式如图\ref{fig:domain-second}所示。本文也同时补充了一阶和二阶扩展之后的蛋白质$domain$相似性特征。
+Huang等人\cite{huang_protein-protein_2013}在运用结构域相互作用网络预测蛋白质相互作用时，提出了使用一阶邻居和二阶邻居计算$domain$相似性的想法，其扩展方式如图\ref{fig:domain-second}所示。本文也同时补充了一阶和二阶扩展之后的蛋白质$domain$相似性特征。
 \begin{figure}[htbp]
     \centering
-    \includegraphics{domain-second}
+    \includegraphics[width=8cm]{domain-second}
     \caption{DDI多阶邻居示意图}
     \label{fig:domain-second}
 \end{figure}
 
 \subsubsection{蛋白质亚细胞定位相似性的邻边特征嵌入}
 
-细胞是一个高度有序的结构，胞内根据空间分布和功能不同，可以分成不同细胞器或细胞区域，蛋白质只有转运到正确的部位才能参与细胞的各种生命活动，ZHANG等人\cite{zhang_protein_2007}认为蛋白质的亚细胞定位有助于研究蛋白质的生物学功能，同时对蛋白质的其他研究如相互作用、进化等也能提供必要的信息。huang等人提出\cite{fan_genome-wide_2017}使用蛋白质复合物和亚细胞定位信息预测关键蛋白质，蛋白质复合物，蛋白质复合物的生成和功能实现和其所处的细胞位置相关，因此蛋白质的亚细胞定位能对蛋白质复合物的形成产生一定的影响。本文将两个蛋白质亚细胞定位数据的交集和并集作为蛋白质的亚细胞定位特征。图\ref{fig:subcell}为苏氨酸蛋白激酶TOR1亚细胞定位图，其中黄色的部分表示其主要的注释区域，包括细胞膜和液膜。
+细胞是一个高度有序的结构，胞内根据空间分布和功能不同，可以分成不同细胞器或细胞区域，蛋白质只有转运到正确的部位才能参与细胞的各种生命活动，ZHANG等人\cite{zhang_protein_2007}认为蛋白质的亚细胞定位有助于研究蛋白质的生物学功能，同时对蛋白质的其他研究如相互作用、进化等也能提供必要的信息。Huang等人提出\cite{fan_genome-wide_2017}使用蛋白质复合物和亚细胞定位信息预测关键蛋白质，蛋白质复合物，蛋白质复合物的生成和功能实现和其所处的细胞位置相关，因此蛋白质的亚细胞定位能对蛋白质复合物的形成产生一定的影响。本文将两个蛋白质亚细胞定位数据的交集和并集作为蛋白质的亚细胞定位特征。图\ref{fig:subcell}为苏氨酸蛋白激酶TOR1亚细胞定位图，其中黄色的部分表示其主要的注释区域，包括细胞膜和液膜。
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics{subcell}
+    \includegraphics[width=8cm]{subcell}
     \caption{苏氨酸蛋白激酶TOR1亚细胞定位图}
     \label{fig:subcell}
 \end{figure}
@@ -354,11 +385,18 @@ huang等人\cite{huang_protein-protein_2013}在运用结构域相互作用网络
 
 \subsubsection{邻边特征嵌入汇总}
 
-在邻边特征嵌入阶段，计算了$PIN$中所有蛋白质相互作用之间的相似性特征，其中包括蛋白质功能注释特征、结构域特征、亚细胞定位特征以及网络拓扑特征。$PIN$中每条相互作用边所具有的特征维度为12维，具体分布如表\ref{tab:PINedgeFeatNUms}所示：
+在邻边特征嵌入阶段，计算了$PIN$中所有蛋白质相互作用之间的相似性特征，其中包括蛋白质功能注释特征、结构域特征、亚细胞定位特征以及网络拓扑特征。$PIN$中每条相互作用边所具有的特征维度为12维，具体计算如公式\ref{equ:feat:edgecat}所示，具体分布如表\ref{tab:PINedgeFeatNums}所示：
+
+\begin{equation}
+    \label{equ:feat:edgecat}
+    F_{ij}=Concat(F_{ij}^{GO},F_{ij}^{DDI},F_{ij}^{Subcell},F_{ij}^{Topo})
+\end{equation}
+其中${ij}$表示第i个结点和第j个结点之间的邻边，$Concat$为特征拼接函数，$F_{ij}$为邻边ij融合之后的12维特征，$F_{ij}^{GO}$为基于功能注释相似性得到的2维邻边特征，$F_{ij}^{DDI}$为基于结构域相似性得到的7维邻边特征，$F_{ij}^{Subcell}$为基于亚细胞定位相似性得到的2维邻边特征，$F_{ij}^{Topo}$为一阶邻居相似性得到的1维邻边特征。
+
 \begin{table}[h]
     \centering
     \caption{$PIN$邻边特征维度分布}
-    \label{tab:PINedgeFeatNUms}
+    \label{tab:PINedgeFeatNums}
     \begin{tabular}{C{3cm}C{3cm}C{3cm}C{3cm}}
         \toprule
         \textbf{功能注释特征} & \textbf{结构域特征} & \textbf{亚细胞定位特征} & \textbf{网络拓扑特征} \\
@@ -385,7 +423,7 @@ huang等人\cite{huang_protein-protein_2013}在运用结构域相互作用网络
 \section{训练和待筛选复合物特征子图样本生成}
 \label{section:featSubNetworkConstruct:allSample}
 
-在$Feated-PIN$的基础上，按照复合物的对应结点抽取局部图$Feated-subGraph$，该局部图包含了复合物内部蛋白质之间的相互作用关系、相关性特征数据及部分蛋白质特征数据，因此可以将局部图作为后续复合物筛选模型的输入数据。该局部子图的示意图如下所示。
+在具有结点特征和邻边特征的蛋白质相互作用网络（$Feated-PIN$）的基础上，按照复合物的对应结点抽取蛋白质复合物特征子图（$Feated-subGraph$），该局部图包含了复合物内部蛋白质之间的相互作用关系、相关性特征数据及部分蛋白质特征数据，因此可以将局部图作为后续复合物筛选模型的输入数据。该局部子图的示意图如下所示。
 
 \begin{figure}[htbp]
     \centering
@@ -398,12 +436,12 @@ huang等人\cite{huang_protein-protein_2013}在运用结构域相互作用网络
 本文正样本由酵母菌标准复合物数据集CYC2008\cite{pu_up--date_2009}和MIPS\cite{pagel_mips_2005}构成，负样本为$PIN$上在一定限制条件下产生的随机子图。COACH算法\cite{leung_predicting_2009}作为在复合物预测方法中具有一定准确度和鲁棒性的方法，其产生的样本作为中间样本。待筛选样本为Dpclus算法、Clique算法和IPCA算法在蛋白质复合物网络中的预测结果对应的样本。
 
 
-\subsection{正样本数据——基于已知蛋白质复合物融合}
+\subsection{正样本数据：基于已知蛋白质复合物融合生成}
 \label{subsection:allSample:positiveSampleData}
 
 蛋白质复合物数据集通常是由单独的研究机构或学校维护，会每隔一段时间更新生物学上已发现的蛋白质复合物。其中CYC2008数据集和MIPS数据集是针对酿酒酵母的蛋白质复合物数据集，且蛋白质复合物数量较多，更新较快，因此本文采用了CYC2008和MIPS数据集作为标准数据集。
 
-为了训练统一的能够识别真正蛋白质复合物的模型，需要将已知的蛋白质复合物做融合，成为统一的正样本数据。由于不同的正样本数据集可能产生高度相似甚至相同的蛋白质复合物，为了保证样本的独立性，本文做了冗余数据的提出处理。
+为了训练统一的能够识别真正蛋白质复合物的模型，需要将已知的蛋白质复合物做融合，成为统一的正样本数据。由于不同的正样本数据集可能产生高度相似甚至相同的蛋白质复合物，为了保证样本的独立性，本文做了冗余数据的剔除处理。
 
 本文以此对比了每一对蛋白质复合物并计算其邻居相似性，邻居相似性的计算方法如公式\ref{equ:compComplexSim:NA}所示，邻居相似性代表了两个蛋白质复合物的重合程度。参考已有方法，当两个复合物邻居相似性高于0.8时，本文剔除其中结点数较低的复合物，从而保证最终的正样本集合中无相似样本，具有一定的独立性。最终形成了734个样本的蛋白质复合物数据集。
 
@@ -417,7 +455,7 @@ huang等人\cite{huang_protein-protein_2013}在运用结构域相互作用网络
 
 经过上述操作，为在Biogrid网络中剔除结点缺失的样本之后最终的正样本子图数据个数为621个，在DIP网络中剔除结点缺失的样本之后最终的正样本子图数据个数为371个。
 
-\subsection{中间样本数据——基于COACH算法}
+\subsection{中间样本数据：基于COACH算法生成}
 \label{subsection:allSample:middleSampleData}
 
 COACH算法是一种基于密集子图发现的蛋白质复合物预测算法，可以直接在无权$PIN$网络中预测的蛋白质复合物样本。该方法算法性能优良，且在多个已知的相互作用网络数据集中预测之后，预测结果的召回率和准确率均有较高的数值，其预测的复合物具有一定的指导性，因此本文将COACH算法的预测结果作为独立的中间样本数据。中间样本数据对标准复合物和随机复合物具有一定的区分度，能对分类器识别复合物具有指导作用。
@@ -428,16 +466,16 @@ COACH算法是一种基于密集子图发现的蛋白质复合物预测算法，
 由于邻居相似性处于0.25附近时，样本可能具有较大的迷惑性，反而影响模型的正常训练，因此剔除相似性在0.25附近的部分样本。
 
 本文对中间样本具体做如下处理：
-\begin{enumerate}
+\begin{itemize}
     \item 计算各个样本和标准复合物的最高邻居相似性，得到0$\thicksim$1的分数;
     \item 剔除其中相似性分数高于0.8的样本，防止样本与标准集重合;
     \item 将相似性分数在0.4$\thicksim$1的样本作为A样本;
     \item 将相似性分数在0$\thicksim$0.2的样本作为B样本;
-\end{enumerate}
+\end{itemize}
 
 经过上述处理，分别得到Biogrid网络和DIP网络运行COACH算法的中间样本数据集，其中Biogrid的A样本为192个、B样本为975个，DIP的A样本为179个、B样本为345个。
 
-\subsection{负样本数据——基于权重动态随机密集子图生成}
+\subsection{负样本数据：基于权重动态随机密集子图生成}
 \label{subsection:allSample:negtiveSampleData}
 
 
@@ -447,14 +485,14 @@ COACH算法是一种基于密集子图发现的蛋白质复合物预测算法，
 
 \begin{figure}[htbp]
     \centering
-    \subcaptionbox{完全随机子图示意图1}{\label{fig:randomgraph:zitu:a}
+    \subcaptionbox{完全随机子图生成样本1}{\label{fig:randomgraph:zitu:a}
         \includegraphics[width=5cm]{randomgraph-old-1}\hskip2cm}
-    \subcaptionbox{完全随机子图示意图2}{\label{fig:randomgraph:zitu:b}
+    \subcaptionbox{完全随机子图生成样本2}{\label{fig:randomgraph:zitu:b}
         \includegraphics[width=5cm]{randomgraph-old-2}}
     \vskip0.5cm
-    \subcaptionbox{限制性随机子图示意图1}{\label{fig:randomgraph:zitu:c}
+    \subcaptionbox{限制性随机子图生成样本1}{\label{fig:randomgraph:zitu:c}
         \includegraphics[width=5cm]{randomgraph-new-1}\hskip2cm}
-    \subcaptionbox{限制性随机子图示意图2}{\label{fig:randomgraph:zitu:d}
+    \subcaptionbox{限制性随机子图生成样本2}{\label{fig:randomgraph:zitu:d}
         \includegraphics[width=5cm]{randomgraph-new-2}}
     \caption{不同随机算法获取的负样本差异图}
     \label{fig:diffrent-random-garphs}
@@ -463,12 +501,12 @@ COACH算法是一种基于密集子图发现的蛋白质复合物预测算法，
 
 本文在网络中按照真实样本的结点数分布抽取负样本，负样本个数为标准样本和中间样本之和。
 
-\subsection{待筛选样本数据——基于核心附属的蛋白质复合物预测算法}
+\subsection{待筛选样本数据：基于核心附属复合物预测算法生成}
 \label{subsection:allSample:coreAttachSampleData}
 
 待筛选样本是用于测试模型有效性的测试样本，由已有的复合物预测算法产生。本文采用了基于核心附属的蛋白质复合物预测算法，包括Dpclus算法、Clique算法和IPCA算法，该类算法均具有较高的复合物样本产生量，其召回率的评价指标较高，具有较高的可优化空间。
 
-分别在DIP和Biogrid蛋白质相互作用网络中使用运行复合物预测算法，其得到的预测结果统计如\label{subsection:allSample:summary}部分所示。
+分别在DIP和Biogrid蛋白质相互作用网络中使用运行复合物预测算法，其得到的预测结果统计如数据汇总与分析所示。
 
 
 
@@ -481,7 +519,7 @@ COACH算法是一种基于密集子图发现的蛋白质复合物预测算法，
 \begin{table}[h]
     \centering
     \caption{训练数据集分布统计表}
-    \label{tab:datasets:statistic}
+    \label{tab:datasets:statistic:train}
     \begin{tabular}{C{3cm}C{2cm}C{3cm}C{3cm}C{2cm}}
         \toprule
         \textbf{网络} & \textbf{正样本数} & \textbf{中间样本数（A）} & \textbf{中间样本数（B）} & \textbf{负样本数} \\
@@ -497,7 +535,7 @@ COACH算法是一种基于密集子图发现的蛋白质复合物预测算法，
 \begin{table}[h]
     \centering
     \caption{待筛选数据集分布统计表}
-    \label{tab:datasets:statistic}
+    \label{tab:datasets:statistic:beselect}
     \begin{tabular}{C{3cm}C{2cm}C{3cm}C{3cm}C{2cm}}
         \toprule
         \textbf{网络} & \textbf{Dpclus算法} & \textbf{Clique算法} & \textbf{IPCA算法} \\

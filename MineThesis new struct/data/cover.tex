@@ -34,44 +34,51 @@
   %=========
   % 英文信息
   %=========
-  etitle={English Title},
-  eauthor={GAO PAN},
-  emajorfirst={TODO},
-  emajorsecond={TODO},
-  edepartment={TODO},
+  etitle={Study on protein complex screening model},
+  eauthor={Pan Gao},
+  emajorfirst={Engineering},
+  emajorsecond={Computer science and technology},
+  edepartment={School of Electronic and Information Engineering},
   % 日期自动使用当前时间，若需手动指定，按如下方式修改：
   % edate={November,\ 2018},
   % efunds={(Supported by the Natural Science Foundation of China for\\ Distinguished Young Scholars, Grant No.123456789)},    
-  esupervisor={TODO}
+  esupervisor={Prof. JiHong Guan}
   % eassosupervisor={Prof. Gang Pei (XiaoWai)}
   % }
 }
 % 定义中英文摘要和关键字
 \begin{cabstract}
-  蛋白质复合物是蛋白质相互结合，完成某一项生物功能的集合。生物学上蛋白质复合物的发现与研究对细胞组成、药物发现等研究至关重要。蛋白质复合物可以通过生物实验的方法发现，但是生物实验成本较高、周期较长，无法满足后续的研究需求。
-  
-  随着计算理论的发展，蛋白质复合物发现邻域出现了基于计算的方法，将蛋白质之间广泛的相互作用抽象成图结构，蛋白质复合物抽象为图结构中的局部结构，此时蛋白质复合物预测问题转换为了图结构的局部子图的发现问题。
+  蛋白质复合物是蛋白质相互结合完成某一项生物功能的集合。生物学上蛋白质复合物的识别与研究对细胞组成分析、药物预测等至关重要。生物实验的方法可以识别蛋白质复合物，但其成本较高、周期较长，无法满足大规模数据时代的研究需求。
+  现有的蛋白质复合物预测算法主要是基于计算的算法，将蛋白质之间广泛的相互作用抽象成图结构，蛋白质复合物抽象为图结构中的局部结构，此时蛋白质复合物预测问题转换为了图结构的局部子图的发现问题。复合物预测算法可以从互作网络中挖掘出大量的局部子图样本，但是由于预测算法本身的局限性，样本中会存在部分不符合复合物形成规律的样本。基于计算的复合物预测算法不具有对其预测结果的评价能力，无法识别并剔除这部分样本。
 
-  然而现有的计算方法通常聚焦于网络中挖掘子图的部分，将复合物预测当成加权或无权网络的密集子图发现问题，而缺少对挖掘出的子图做评价的部分。蛋白质复合物的预测到对预测结果的评价之间存在改进的空间。不同复合物预测方法可以得到大量的复合物预测结果，由于预测方法本身存在的缺陷，预测结果中存在部分不符合复合物形成规律的样本，而预测方法无法精确的识别并剔除这部分复合物。
-  
-  针对该问题，本文基于预测后复合物样本的评价与筛选模型研究（简称后筛选）设计可行且有效的模型框架，基于多种图卷积神经网络及其变种实现了复合物特征子图的评分模型。
+  针对该问题，本文进行了蛋白质复合物样本评价模型的研究，提出了可行且有效的复合物筛选框架。数据部分本文构建了融合结点特征和邻边特征的蛋白质相互作用网络，并基于该网络构建了复合物子图数据集。模型部分本文提出了三种复合物筛选模型，分别是基于图卷积的模型、基于邻边卷积的模型和基于消息传递网络的模型。
 
-  本文具体进行了如下研究：
+  本文的研究工作及贡献：
 
-  1）构建融合结点特征和邻边特征的蛋白质相互作用网络。通过生物学上的多种特征提取方法，以及GAE、Deepwalk等网络嵌入方法，本文得到了兼具结点特征和邻边特征的$PIN$网络结构。
+  1）构建融合结点特征和邻边特征的蛋白质相互作用网络。通过图自编码器、深度随机游走等网络嵌入方法，生物学上的多种相似性特征提取方法，本文构建了兼具结点特征和邻边特征的蛋白质相互作用网络。
 
-  2）复合物子图数据集构建。基于邻居相似性融合多个标准集构建了正样本数据集；基于COACH算法的结果构建中间样本数据集；提出了改进的随机算法构建负样本数据集。在特征$PIN$中抽取特征子图作为训练样本。
+  2）复合物特征子图数据集构建。基于邻居相似性融合多个标准集构建了正样本数据集；基于COACH算法的结果构建中间样本数据集；提出了改进的随机算法构建负样本数据集；基于核心附属算法的蛋白质复合物预测算法构建待筛选数据集。基于特征子图提取方法，在特征蛋白质相互作用网络中构建对应的特征子图数据集。
 
-  3）复合物分类模型研究。在具有特征网络的前提下，本文研究了多种融合特征的复合物分类模型，提出了针对结点特征的图卷积模型、针对邻居特征的EdgeConv模型以及实现特征融合的消息传递网络模型。
-
-  4）相关对比实验及验证。对于每一个模型本文进行了多项实验验证模型的有效性，$PPI$网络包括DIP网络和Biogrid网络，并在Dpclus、ipca等方法上验证筛选结果，验证的指标包括f1值和复合物预测邻域的融合指标。
+  3）复合物筛选模型研究。在复合物特征子图数据集的基础上，本文研究了多种融合特征的复合物筛选模型，提出了针对结点嵌入特征的基于传统图卷积的复合物筛选模型、针对邻边相似性特征的基于邻边卷积的复合物筛选模型、针对特征融合的基于消息传递网络的复合物筛选模型。实验部分，本文对于每一个模型本文进行了多项对比实验验证模型的有效性，每项实验对比了筛选前后复合物预测结果的评价指标，其中蛋白质复合物相互作用网络包括DIP网络和Biogrid网络，蛋白质复合物预测算法包括Dpclus算法、IPCA算法和Clique算法，评价指标包括F1值和复合物预测领域的SPA值。
 
 \end{cabstract}
 
-\ckeywords{蛋白质复合物，监督学习，图神经网络，生物信息学，图分类模型，后处理}
+\ckeywords{蛋白质复合物预测，图神经网络，蛋白质相互作用网络，子图分类，图嵌入}
 
 \begin{eabstract}
-  TODO
+  A protein complex is a collection of proteins that bind to each other to accomplish a biological function. The identification and research of protein complexes in biology are very important for cell composition analysis, drug prediction and so on. The method of biological experiment can identify protein complex, but its cost is high and the cycle is long, which can not meet the research demand of large-scale data age.
+  The existing protein complex prediction algorithm is mainly based on the calculation algorithm, which abstracts the wide interaction between proteins into a graph structure, and the protein complex abstracts into a local structure in the graph structure, at which time the protein complex prediction problem is transformed into a local sub-map of the graph structure. The composite prediction algorithm can extract a large number of local subgraph samples from the mutual network, but due to the limitations of the prediction algorithm itself, there will be some samples in the sample that do not conform to the formation law of the compound. The calculation-based compound prediction algorithm does not have the ability to evaluate its prediction results, and cannot identify and reject this part of the sample.
+
+  In view of this problem, the paper studies the evaluation model of protein complex samples and puts forward a feasible and effective framework for compound screening. The data part of this paper builds a protein interaction network that combines node features and adjacent features, and builds a composite subgraph dataset based on this network. In this part of the model, three composite filtering models are proposed, namely, a model based on the volume of the map, a model based on the volume of the adjacent edge, and a model based on the messaging network.
+
+  The research work and contribution of this paper:
+
+  1) Build a protein interaction network that combines node features with adjacent features. Through network embedding methods such as graph self-encoder and deep random walk, a variety of similar feature extraction methods in biology are constructed, and a protein interaction network with node and neighbor characteristics is constructed.
+
+  2) Composite feature subgraph dataset construction. Positive sample data sets are constructed based on multiple standard sets of neighbor similarity fusion, intermediate sample data sets are constructed based on the results of COACH algorithm, negative sample data sets are proposed by improved random algorithms, and protein complex prediction algorithms based on core satellite algorithms are proposed to construct the data set to be filtered. Based on the characteristic subgraph extraction method, the corresponding feature subgraph dataset is constructed in the characteristic protein interaction network.
+
+  3) Study of composite screening model. Based on the composite feature submap data set, this paper studies the composite filtering model of various fusion features, and puts forward the composite filtering model based on traditional converse for node embedding features, the composite filtering model based on neighbor converse features, and the composite filtering model based on messaging network for feature fusion. In the experimental part, this paper compares the validity of each model, and each experiment compares the evaluation index of the prediction results of the compound before and after screening, in which the protein complex interaction network includes dip network and Biogrid network, the protein complex prediction algorithm includes the Dpclus algorithm, the IPCA algorithm and the Clique algorithm, and the evaluation index includes the SPA value in the field of F1 value and compound prediction.
+
 \end{eabstract}
 
-\ekeywords{TODO}
+\ekeywords{Protein complex prediction, Graph neural networks, Protein-Protein interaction networks, Sub-graph classification, Graph embedding}

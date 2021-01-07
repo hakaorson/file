@@ -1,45 +1,48 @@
 \chapter{基于邻边卷积网络的复合物筛选模型}
 \label{chapter:EdgeConv}
+
+本章首先介绍了生物数据对复合物预测的重要性，介绍了生物数据在蛋白质相互作用网络中的邻边嵌入。同时介绍了基于邻边嵌入的相关图卷积算法，并提出了基于邻边卷积网络的复合物筛选模型。最后针对该模型进行了相关的对比实验并分析了实验结果。
+
 \section{引言}
 \label{section:EdgeConv:Put}
 
 已有方法已经充分表明，在PPI网络中进行蛋白质复合物预测不仅仅是一个图论中的聚簇发现问题，更是一个信息融合问题。无论是加权网络方法、核心附属结构预测方法，都致力于最大程度的利用生物学信息进行辅助预测。
 
-而已有的算法通常将生物学信息，包括GO功能注释、拓扑域、亚细胞定位等转换为蛋白质之间的相似性数据，即映射为邻边数据。已有的基于加权图的复合物预测算法是将邻边特征映射到固定的权重计算公式中，相较于基于无权图的算法，如绪论中阐述所示，其预测复合物的质量有较好的提升，说明邻边数据在复合物预测邻域具有一定的重要性。
+而已有的算法通常将生物学信息，包括GO功能注释、拓扑域、亚细胞定位等转换为蛋白质之间的相似性数据，即映射为邻边数据。已有的基于加权图的复合物预测算法是将邻边特征映射到固定的权重计算公式中，相较于基于无权图的算法，其预测复合物的质量有较好的提升，说明邻边数据在复合物预测领域具有一定的重要性。
 
-目前该研究邻域尚未出现邻边特征动态更新的算法。
+然而，硬编码的过程只能将丰富的生物数据进行简单的映射，无法做到对生物数据的高维抽象。
+目前该研究领域也尚未出现对邻边特征进行高维非线性抽象的算法。
 基于以上前提，本文提出了利用生物特征基于邻边卷积网络的复合物局部子图分类模型。
 
 \section{邻边卷积网络介绍}
 \label{section:EdgeConv:intro}
 
-邻边卷积网络（EdgeBase Convolution）由点云学习领域提出，是一种基于邻边做特征转换以及特征聚合的方法。点云学习指的是使用计算机的方法学习与分析空间中独立数据点的集合，数据点的信息包括坐标、颜色、分类、强度值等等信息，数据点在空间中的集合状态即为点云。点云学习的任务是对点云数据做分割、物体识别等等。
+邻边卷积网络\cite{wang_dynamic_2019}（EdgeBase Convolution）由点云学习领域提出，是一种基于邻边做特征转换以及特征聚合的方法。点云学习指的是使用计算机的方法学习与分析空间中独立数据点的集合，数据点的信息包括坐标、颜色、分类、强度值等等信息，数据点在空间中的集合状态即为点云。点云学习的任务是对点云数据做分割、物体识别等等。
 
 在点云任务中，会与待更新结点i周围的K个最近邻居建立连边，基于连边做特征更新，然后所有的连边特征汇聚到一起作为结点的新特征。连边特征更新的过程中会考虑源点与汇点的信息流动，其具体的过程如图\ref{fig:EdgeConv/main}所示。
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=14cm]{EdgeConv/main}
-    \caption{基于邻边的图卷积神经网络更新示意图}
+    \caption{基于邻边的图卷积神经网络更新示意图\cite{wang_dynamic_2019}}
     \label{fig:EdgeConv/main}
 \end{figure}
+
 对于结点i的更新，需要从结点i周围的5个邻居建立到结点i的邻边。对于其中某一条邻边$E_{j,i}$，其两个端点分别具有各自的特征，将特征拼接到一起，然后经过邻边卷积的多层感知器计算，即可得到邻边特征更新后的结果$e_{ij}$如图中左侧所示。
-更新结点i周围所有的邻边特征，然后计算其和值，就形成了结点i更新之后的特征，如图中右侧所示。
-
-
-
+更新结点i周围所有的邻边特征，然后计算其和值，就形成了结点i更新之后的特征，如图\ref{fig:EdgeConv/main}中右侧所示。
 
 \section{基于邻边卷积网络的复合物筛选模型}
 \label{section:EdgeConv:detail}
 
 
+\subsection{基于邻边卷积单层更新}
 
-本章基于邻边卷积\ref{section:EdgeConv:intro}阐述基于邻边卷积网络的复合物筛选模型。
 在通常的图卷积过程中，结点A的特征为周围所有结点的特征和自生特征决定，可以采取平均值的计算方法，如公式\ref{equ:NormalGCNNodeFlow}所示。
 \begin{equation}
     \label{equ:NormalGCNNodeFlow}
     f_a=\delta (\frac{\sum_{i = 1}^{n}f_i+f_a}{n+1})
 \end{equation}
 其中$f_a$代表A结点的特征，$f_i$代表A结点所有邻居的特征，$\delta$为信息汇聚之后的特征更新函数。
+
 在基于邻边卷积的复合物预测方法中，结点特征更新由其邻边共同决定。其具体计算过程如公式\ref{equ:EdgetoNodeFeat}所示。
 \begin{equation}
     \label{equ:EdgetoNodeFeat}
@@ -71,14 +74,14 @@
     \label{fig:EdgeConv/edgeconv}
 \end{figure}
 
-\section{算法具体实现与流程}
-\label{section:EdgeConv:flow}
-本文处理了大量的生物学数据，包括蛋白质功能注释数据、结构域相互作用数据、亚细胞定位数据等，应用相关的生物邻域的处理方法将生物学数据转换为可应用的特征数据，最终得到了12维度的特征数据。所有的特征都描述蛋白质相互作用，因此在图结构中，这些特征编码为图结构邻边的特征。
+\subsection{特征子图评价模型}
+
+本文处理了大量的生物学数据，包括蛋白质功能注释数据、结构域相互作用数据、亚细胞定位数据等，应用相关的生物领域的处理方法将生物学数据转换为可应用的特征数据，最终得到了12维度的特征数据。所有的特征都描述蛋白质相互作用，因此在图结构中，这些特征编码为图结构邻边的特征。
 基于邻边卷积特征的复合物筛选模型总体流程如图\ref{fig:EdgeConv/flow}所示。
 
-第一阶段需要将初始的邻边特征以汇聚方法初始化结点特征，如图中上半部分所示。该汇聚方法为初始结点特征由其周围所有邻边特征的平均值替代。其具体的计算过程如公式\ref{equ:EdgetoNodeFeat}所示，其中激活函数为直接映射。其过程可被视为聚合阶段的基于边卷积神经网络过程，如图中\ref{fig:EdgeConv/edgeconv}下半部分所示。
+第一阶段如标号1所示，需要将初始的邻边特征以汇聚方法初始化结点特征，如图中上半部分所示。该汇聚方法为初始结点特征由其周围所有邻边特征的平均值替代。其具体的计算过程如公式\ref{equ:EdgetoNodeFeat}所示，其中激活函数为直接映射。其过程可被视为聚合阶段的基于边卷积神经网络过程，如图中\ref{fig:EdgeConv/edgeconv}下半部分所示。
 
-第二阶段需要基于邻边卷积将特征与拓扑结构融合，基于pool方法得到子图结构的特征表示，并基于子图特征做分类预测以及评分预测。其具体过程如图中下半部分所示。
+第二阶段如标号2所示，需要基于邻边卷积将特征与拓扑结构融合，基于pool方法得到子图结构的特征表示，并基于子图特征做分类预测以及评分预测。其具体过程如图中下半部分所示。
 
 模型使用了两层的基于邻边卷积的图神经网络，图卷积过程中隐层维度设置为64朴维。
 两层图卷积之后，采用了对结点特征分别做最大值池化和平均值池化的方法，拼接到一起得到128维的子图特征。后续分别为两层感知器和softmax层得到图的分类预测，两层感知器和sigmoid层得到图的评分预测。
@@ -90,6 +93,8 @@
     \caption{基于邻边卷积特征的复合物筛选模型总体流程}
     \label{fig:EdgeConv/flow}
 \end{figure}
+
+\subsection{筛选模型算法流程}
 
 \section{实验设计及结果分析}
 \label{section:EdgeConv:experience}
@@ -120,7 +125,55 @@
     \caption{Biogrid网络不同模型处理后结果对比}
     \label{fig:result/Biogrid/edge}
 \end{figure}
-从图中可以看出添加了生物特征后，Biogrid网络相应样本的F1值均有较为明显的提升，而Clique算法的样本提升最为明显。综合评价指标SPA值也具有一定的提升。
+从图\ref{fig:result/Biogrid/edge}中可以看出添加了生物特征后，Biogrid网络相应样本的F1值均有较为明显的提升，而Clique算法的样本提升最为明显。综合评价指标SPA值也具有一定的提升。
+
+图\ref{fig:result/DIP/edge}和图\ref{fig:result/Biogrid/edge}的数据如下所示。
+\begin{table}[h]
+    \centering
+    \caption{DIP网络不同模型处理后结果对比数据}
+    \begin{tabular}{C{2cm}C{2cm}C{2cm}C{2cm}}
+        \toprule
+        \textbf{F1值} & \textbf{原始数据} & \textbf{随机GCN筛选} &\textbf{邻边特征GCN筛选} \\
+        \midrule
+        Dpclus算法    & 0.414             & 0.352                & 0.484                                 \\
+        Clique算法    & 0.296             & 0.222                & 0.453                              \\
+        IPCA算法      & 0.291             & 0.300                & 0.420                               \\
+        \bottomrule
+    \end{tabular}
+    \begin{tabular}{C{2cm}C{2cm}C{2cm}C{2cm}}
+        \toprule
+        \textbf{SPA值} & \textbf{原始数据} & \textbf{随机GCN筛选} & \textbf{邻边特征GCN筛选} \\
+        \midrule
+        Dpclus算法     & 1.333             & 1.340                & 1.490                                    \\
+        Clique算法     & 0.658             & 0.596                & 0.731                                  \\
+        IPCA算法       & 0.794             & 0.729                & 0.838                               \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \caption{Biogrid网络不同模型处理后结果对比数据}
+    \begin{tabular}{C{2cm}C{2cm}C{2cm}C{2cm}}
+        \toprule
+        \textbf{F1值} & \textbf{原始数据} & \textbf{随机GCN筛选} &\textbf{邻边特征GCN筛选} \\
+        \midrule
+        Dpclus算法    & 0.425             & 0.445                & 0.529                                 \\
+        Clique算法    & 0.203             & 0.216                & 0.510                              \\
+        IPCA算法      & 0.294             & 0.122                & 0.373                               \\
+        \bottomrule
+    \end{tabular}
+    \begin{tabular}{C{2cm}C{2cm}C{2cm}C{2cm}}
+        \toprule
+        \textbf{SPA值} & \textbf{原始数据} & \textbf{随机GCN筛选} & \textbf{邻边特征GCN筛选} \\
+        \midrule
+        Dpclus算法     & 1.796             & 1.119                & 1.950                                    \\
+        Clique算法     & 0.901             & 0.532                & 1.011                                  \\
+        IPCA算法       & 0.859             & 0.886                & 0.891                               \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
 
 \section{本章小结}
 \label{section:EdgeConv:summary}

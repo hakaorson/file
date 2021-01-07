@@ -1,10 +1,14 @@
 \documentclass[degree=doctor,bibtype=numeric]{tongjithesis}
 \usepackage{tongjiutils}
-
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amsmath}
+\renewcommand{\algorithmicrequire}{ \textbf{Input:}}  
+\renewcommand{\algorithmicensure}{ \textbf{Output:}} 
 %参考文献更新使用biblatex包, 使用gb7714-2015标准, 具体参数设置可在cls文件中搜索biblatex进行了解
 %加入bib文件(老版本文件依然能够使用)
 \addbibresource{ref/refs_from_zotero.bib}   %
-
+\hypersetup{hidelinks}
 
 \begin{document}
 
@@ -42,4 +46,10 @@
 \include{data/newchap06}
 % 参考文献
 \printTJbibliography
+
+\begin{acknowledgement}
+    \input{data/ack}
+\end{acknowledgement}
+
+
 \end{document}

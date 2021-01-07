@@ -1,5 +1,8 @@
 \chapter{基于消息传递网络的复合物筛选模型}
 \label{chapter:MPNN}
+
+本章总结了基于结点和基于邻边卷积网络各自的特点，提出了融合特征的重要性。介绍了适合于融合特征的图卷积神经网络算法以及相关消息传递机制的实现。提出了基于消息传递网络的复合物筛选模型，并进行了相关的实验与分析。
+
 \section{引言}
 \label{section:MPNN:Put}
 
@@ -10,7 +13,7 @@
 \section{消息传递网络介绍}
 \label{section:MPNN:intro}
 
-MPNN网络是一种基于消息传递的图结构学习框架。不同于图卷积模型必须将特征绑定到结点，MPNN将图结构的特征当成消息，特征在结构中的流动被视为消息的传递。在此框架下，图卷积神经网络可以被当作MPNN的特例，是只传递结点消息的MPNN网络。
+MPNN网络\cite{gilmer_neural_2017}是一种基于消息传递的图结构学习框架。不同于图卷积模型必须将特征绑定到结点，MPNN将图结构的特征当成消息，特征在结构中的流动被视为消息的传递。在此框架下，图卷积神经网络可以被当作MPNN的特例，是只传递结点消息的MPNN网络。
 
 
 MPNN网络的具体实现如式\ref{equ:MPNNPassing}所示。
@@ -28,7 +31,7 @@ MPNN网络的具体实现如式\ref{equ:MPNNPassing}所示。
 
 \section{基于消息传递网络的复合物筛选模型}
 \label{section:MPNN:detail}
-
+\subsection{基于消息传递网络单层更新}
 基于消息传递网络的复合物筛选模型是基于MPNN网络的改进。
 为了使得结点特征和邻边特征具有融合的能力，蛋白质复合物特征融合模型中采用了结点更新邻边，邻边更新结点的方式。在每一层的MPNN过程中，结点t时刻特征更新为邻边t+1时刻特征、邻边t特征更新为结点t+1时刻特征。结点特征的更新具体方法如下所示，其中$Linear$为一层感知器。
 \begin{equation}
@@ -40,18 +43,17 @@ MPNN网络的具体实现如式\ref{equ:MPNNPassing}所示。
     \label{equ:MineMPNNReadout}
     h_v^{t+1} = Max(h_v^t,m_v^{t+1})
 \end{equation}
-从式中可以看出，结点的特征更新来源分为两部分，其一为汇聚所有邻边的特征$e_{vw}^t$，同时为了保留一部分结点中具有关键性的原始特征，其更新方式采用了maxpool。邻边特征的具体更新方法如下所示。
+从式中可以看出，结点的特征更新来源分为两部分，其一为汇聚所有邻边的特征$e_{vw}^t$，同时为了保留一部分结点中具有关键性的原始特征，其更新方式采用了maxPooling。邻边特征的具体更新方法如下所示。
 \begin{equation}
     \label{equ:MineMPNNedge}
     e_{vw}^{t+1} = Max(e_{vw}^t,Linear_0^t(m_w^{l} - m_v^{l}) + Linear_1^t m_v^{l})
 \end{equation}
-从式中得出，类似于结点更新模型，邻边的特征更新也可以分为两部分，最后同样采用了maxpool的方式保留关键邻边特征。邻边特征的更新方式综合考虑了源点到汇点的特征流动部分$m_w^{l} - m_v^{l}$以及汇点的特征保留部分$m_v^{l}$。
+从式中得出，类似于结点更新模型，邻边的特征更新也可以分为两部分，最后同样采用了maxPooling的方式保留关键邻边特征。邻边特征的更新方式综合考虑了源点到汇点的特征流动部分$m_w^{l} - m_v^{l}$以及汇点的特征保留部分$m_v^{l}$。
 
 
 最后融合模型同样考虑了复合物子图的整体拓扑特征，为通过图论计算的总体拓扑结构数据，作为不可学习的特征与MPNN读出的特征拼接到一起，作为最终的图特征输出。总体拓扑特征计算参考\cite{yu_predicting_2014}。
 
-\section{算法具体实现与流程}
-\label{section:MPNN:flow}
+\subsection{特征子图评价模型}
 
 子图数据保留GO注释特征、拓扑域特征以及亚细胞定位特征等邻边特征，保留Deepwalk特征、GAE特征等结点特征。形成兼具结点和邻边特征的复合物特征子图数据，其中结点特征维度为82维，邻边特征维度维12维。
 
@@ -62,9 +64,11 @@ MPNN网络的具体实现如式\ref{equ:MPNNPassing}所示。
     \label{fig:MPNN/flow}
 \end{figure}
 
-在模型中，添加了两层结点和邻边同时更新的MPNN网络，如图\ref{fig:MPNN/flow}所示。每一层MPNN网络中，结点特征更新由结点以及结点周围邻边特征共同确定，如示意图中的结点特征矩阵隐层的数据流所示，其具体的计算方法如公式\ref{equ:MineMPNNReadout}所示。邻边特征更新由邻边以及邻边两侧端点的结点特征共同确定，如示意图中的邻边特征矩阵隐层的数据流所示，其具体的计算方法如公式\ref{equ:MineMPNNedge}所示。
+在模型中，添加了两层结点和邻边同时更新的MPNN网络，如图\ref{fig:MPNN/flow}所示。每一层MPNN网络中，结点特征更新由结点以及结点周围邻边特征共同确定，如示意图中的结点特征矩阵隐层的数据流所示，过程3是表示通过结点的邻边特征汇聚到一起，再结合过程4结点本身继承上一步的特征，其具体的计算方法如公式\ref{equ:MineMPNNReadout}所示。邻边特征更新由邻边以及邻边两侧端点的结点特征共同确定，如示意图中的邻边特征矩阵隐层的数据流所示，过程2表示邻边特征由其源点和汇点特征共同计算，过程1表示邻边特征继承上一步的特征，其具体的计算方法如公式\ref{equ:MineMPNNedge}所示。
 
-消息传递过程中隐层维度设置为64维，两层消息传递之后，采用了对结点特征Maxpool和MeanPool的池化方法以及对邻边Maxpool和MeanPool的池化方法。一共可以得出四个池化结果，对结果进行拼接之后，形成的256维的特征代表图整体特征。后续分别为两层感知器和softmax层得到图的分类预测，两层感知器和sigmoid层得到图的评分预测。
+消息传递过程中隐层维度设置为64维，两层消息传递之后，采用了对结点特征MaxPooling和MeanPooling的池化方法以及对邻边MaxPooling和MeanPooling的池化方法。一共可以得出四个池化结果，如图中concat到一起之后的四色特征所示，对结果进行拼接之后，形成的256维的特征代表图整体特征。后续分别为两层感知器和softmax层得到图的分类预测，两层感知器和sigmoid层得到图的评分预测。
+
+\subsection{筛选模型算法流程}
 
 \section{实验设计及结果分析}
 \label{section:MPNN:experience}
@@ -90,7 +94,7 @@ MPNN网络的具体实现如式\ref{equ:MPNNPassing}所示。
     \label{fig:result/DIP/fusion}
 \end{figure}
 
-从图中可以看出，在DIP网络中，MPNN融合模型在F1的结果中取得了较大的提升，在Dpclus和Clique的数据样本中均得到了最优结果。
+从图\ref{fig:result/DIP/fusion}中可以看出，在DIP网络中，MPNN融合模型在F1的结果中取得了较大的提升，在Dpclus和Clique的数据样本中均得到了最优结果。
 
 图\ref{fig:result/Biogrid/fusion}为在Biogrid网络中，基于结点的全局特征模型、基于邻边的生物特征模型以及特征融合模型筛选之后结果的对比。
 \begin{figure}[htbp]
@@ -103,8 +107,54 @@ MPNN网络的具体实现如式\ref{equ:MPNNPassing}所示。
     \caption{Biogrid网络不同模型处理后结果对比}
     \label{fig:result/Biogrid/fusion}
 \end{figure}
-从图中可以看出，在Clique样本集上，其综合评价指标和F1值均达到了最优结果。而在Dpclus的样本集中，综合评价指标也得到了最优结果。
+从图\ref{fig:result/Biogrid/fusion}中可以看出，在Clique样本集上，其综合评价指标和F1值均达到了最优结果。而在Dpclus的样本集中，综合评价指标也得到了最优结果。
 
+图\ref{fig:result/DIP/fusion}和图\ref{fig:result/Biogrid/fusion}的数据如下所示。
+\begin{table}[h]
+    \centering
+    \caption{DIP网络不同模型处理后结果对比数据}
+    \begin{tabular}{C{2cm}C{2cm}C{2cm}C{2cm}C{2cm}}
+        \toprule
+        \textbf{F1值} & \textbf{原始数据} & \textbf{全局特征GCN筛选} & \textbf{邻边特征GCN筛选} & \textbf{融合模型筛选} \\
+        \midrule
+        Dpclus算法    & 0.414             & 0.434                    & 0.484                    & 0.501                 \\
+        Clique算法    & 0.296             & 0.477                    & 0.453                    & 0.487                 \\
+        IPCA算法      & 0.291             & 0.336                    & 0.420                    & 0.408                 \\
+        \bottomrule
+    \end{tabular}
+    \begin{tabular}{C{2cm}C{2cm}C{2cm}C{2cm}C{2cm}}
+        \toprule
+        \textbf{SPA值} & \textbf{原始数据} & \textbf{全局特征GCN筛选} & \textbf{邻边特征GCN筛选} & \textbf{融合模型筛选} \\
+        \midrule
+        Dpclus算法     & 1.333             & 1.425                    & 1.490                    & 1.498                 \\
+        Clique算法     & 0.658             & 0.815                    & 0.731                    & 0.729                 \\
+        IPCA算法       & 0.794             & 0.922                    & 0.838                    & 0.848                 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \caption{Biogrid网络不同模型处理后结果对比数据}
+    \begin{tabular}{C{2cm}C{2cm}C{2cm}C{2cm}C{2cm}}
+        \toprule
+        \textbf{F1值} & \textbf{原始数据} & \textbf{全局特征GCN筛选} & \textbf{邻边特征GCN筛选} & \textbf{融合模型筛选} \\
+        \midrule
+        Dpclus算法    & 0.425             & 0.470                    & 0.529                    & 0.521                 \\
+        Clique算法    & 0.203             & 0.373                    & 0.510                    & 0.542                 \\
+        IPCA算法      & 0.294             & 0.366                    & 0.373                    & 0.364                 \\
+        \bottomrule
+    \end{tabular}
+    \begin{tabular}{C{2cm}C{2cm}C{2cm}C{2cm}C{2cm}}
+        \toprule
+        \textbf{SPA值} & \textbf{原始数据} & \textbf{全局特征GCN筛选} & \textbf{邻边特征GCN筛选} & \textbf{融合模型筛选} \\
+        \midrule
+        Dpclus算法     & 1.796             & 1.871                    & 1.950                    & 1.948                 \\
+        Clique算法     & 0.901             & 1.009                    & 1.011                    & 1.041                 \\
+        IPCA算法       & 0.859             & 0.970                    & 0.891                    & 0.834                 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 \section{本章小结}
 \label{section:MPNN:summary}

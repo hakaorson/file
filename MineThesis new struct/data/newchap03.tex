@@ -1,6 +1,8 @@
 \chapter{基于图卷积神经网络的复合物筛选模型}
 \label{chapter:NodeConv}
 
+本章介绍利用结点特征基于图卷积神经网络的复合物筛选模型，介绍了模型实现的细节和整体的模型实现流程。同时本章介绍了通用的相关的实验参数与指标。最后本章进行了相关实验并对实验结果进行了分析。
+
 \section{引言}
 \label{section:NodeConv:Put}
 
@@ -8,7 +10,7 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=14cm]{entropy-classification}
+    \includegraphics[width=12cm]{entropy-classification}
     \caption{基于图拓扑特征的蛋白质复合物分类模型}
     \label{fig:entropy-classification}
 \end{figure}
@@ -23,6 +25,8 @@
 \section{基于图卷积神经网络的复合物筛选模型}
 \label{section:NodeConv:detail}
 
+\subsection{基于结点卷积单层更新}
+
 本文在\ref{subsection:featPPINetwork:nodeFeatConstruct}部分简单介绍了图卷积神经网络。本节介绍在基于图卷积神经网络的复合物筛选模型中单一图卷积网络的计算方法。
 
 在单一的卷积层中，结点特征的计算方法如下图所示。
@@ -35,7 +39,7 @@
 \end{figure}
 如图中所示，结点A的特征将有结点$\{A,D,E,H,J\}$共同确定，图中左侧为未更新状态，右侧为更新结点特征过程中的数据流动。其具体过程可以表示为如下的公式。
 \begin{equation}
-    \label{equ:loss}
+    \label{equ:normalgcn}
     h_i^{(l+1)} = \sigma(b^{(l)} + \sum_{j\in\mathcal{N}(i)}\frac{1}{c_{ij}}h_j^{(l)}W^{(l)})
 \end{equation}
 其中$\mathcal{N}(i)$表示结点i的所有邻居，${c_{ij}}$表示结点i和结点j度乘积的平方根，其具体计算为$c_{ij} = \sqrt{|\mathcal{N}(i)|}\sqrt{|\mathcal{N}(j)|}$，$\sigma$表示激活函数，$b^{(l)}$表示卷积过程中的偏移值。
@@ -44,37 +48,77 @@
 
 上式为单个结点的更新过程，将子图中所有结点更新一轮之后即完成一层图卷积过程，图中结点特征从第l层更新到第l+1层。
 
-\section{算法具体实现与流程}
-\label{section:NodeConv:flow}
+\subsection{特征子图评价模型}
+\label{subsection:NodeConv:flow}
 
-下面从数据流的层面阐述从特征子图数据到样本评价数据的实现流程。
+下面从数据流的层面阐述从特征子图数据到样本评价数据的实现流程。基于全局特征的复合物分类模型总体结构如图\ref{fig:GCN/flow}所示。
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=14cm]{GCN/flow}
     \caption{基于图卷积神经网络的复合物筛选模型总体流程}
     \label{fig:GCN/flow}
 \end{figure}
+模型的初始输入特征结点特征，维度为80维，其中包括基于Deepwalk嵌入特征64维和GAE嵌入特征16维。
+在初始特征之后加入了两层图卷积模型，图卷积模型如\ref{section:NodeConv:detail}所示，图卷积可以融合图中结点特征和拓扑结构对结点特征进行更新。图卷积过程中隐层维度设置为64维。两层图卷积之后，采用了对结点特征MaxPooling和MeanPooling的池化方法。两种池化方法的结果进行拼接之后，形成的128维的特征代表图整体特征，如图中1和2部分所示，1部分代表MaxPooling得到的64维特征，2部分代表通过MeanPooling得到的64维特征。
 
-基于全局特征的复合物分类模型总体结构如图\ref{fig:GCN/flow}所示。模型的初始输入特征结点特征，维度为80维，其中包括基于Deepwalk嵌入特征64维和GAE嵌入特征16维。
+分类与评分部分，3和4即代表了两种Pool方法拼接之后的结果，作为代表子图的特征向量。
+后续分别为两层感知器和softmax层得到图的分类预测，两层感知器和sigmoid层得到图的评分预测。而两项预测结果采用公式\ref{equ:loss}的损失函数统一起来。通过不断的优化损失函数，可以使得特征向量同时具备分类与评分特征。
 
-在初始特征之后加入了两层图卷积模型，图卷积模型如上节所示，可以融合图中结点特征和拓扑结构对结点特征进行更新。图卷积过程中隐层维度设置为64维。两层图卷积之后，采用了对结点特征Maxpool和MeanPool的池化方法。两种池化方法的结果进行拼接之后，形成的128维的特征代表图整体特征。后续分别为两层感知器和softmax层得到图的分类预测，两层感知器和sigmoid层得到图的评分预测。
 分类指标和评分将作为蛋白质复合物的综合评价指标，具体计算方法如\ref{section:NodeConv:allExperienceDesign}中损失函数计算部分所示。
 
+\subsection{筛选模型算法流程}
+
+具体算法如下所示。
+
+\begin{algorithm}[h]
+    \caption{基于图卷积神经网络的复合物筛选模型} % 名称
+    \label{alg::nodeconv}
+    \begin{algorithmic}
+        \Require
+        $PIN$:Protein-Protein Interaction Network
+
+        \Ensure
+        $F_1$
+        \State initial nodefeat=1, $F_0$;initial i=0;
+        \Repeat
+        \State compute hidden feat 1, $F_1=GCN(G,F_0)$;
+        \State compute hidden feat 2, $F_2=GCN(G,F_1)$;
+        \State compute hidden feat 3, $F_3=GCN(G,F_1)$;
+        \State reconstruct graph, $A^{\prime}=Dec(F_3)$;
+        \State compute loss, $L=MSELoss(A^{\prime},A)$;
+        \State optimization, $Adam(L)$;
+        \State i=i+1;
+        \Until{$i=80$}
+        \State extract node feats to $F$, $F$=$F_3$;
+    \end{algorithmic}
+\end{algorithm}
 
 \section{实验参数与评估指标}
 \label{section:NodeConv:allExperienceDesign}
+本节介绍实验相关环境、实验通用超参数设置、相关优化器以及评估指标，该部分内容适用于本文所有复合物筛选模型的实验，后续章节中不做重复阐述。
+
+\subsection{实验环境}
+\label{subsection:allExperienceDesign:Environment}
+
+本文的实验基于Linux系统Ubuntu16.04版本，处理器型号为Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz，内存大小为128GB。本文代码基于Python编写，其中深度学习框架基于Pytorch，图神经网络框架基于DGL库\cite{wang_deep_2020}。
+
+\subsection{实验参数}
+\label{subsection:allExperienceDesign:nums}
+
 由于训练数据的不平衡性，训练模型之前，数据进行了重采样处理，保持各分类训练样本相等。按照$8:2$的比率分割各分类样本，形成训练集和测试集。在分类模型的训练过程中，观察训练集和测试集的损失函数，根据早停策略得到未过拟合最佳模型。
 由于各项特征数据存在不平衡性，部分数据如蛋白质长度等数值过大，本文将所有的特征数据进行了统一的归一化和标准化处理。
 
 本文采用0.001的学习率，batch大小设置为32，隐层维度为128，模型使用了两层的GCN网络以及两层的分类器。
-采用LeakyRelu\ref{fig:leakyrelu}作为激活函数和AdamOptimism作为模型优化器。
+采用LeakyRelu作为激活函数和AdamOptimizer作为模型优化器。LeakyRelu激活函数如图\ref{fig:leakyrelu}所示。
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=10cm]{leakyrelu}
+    \includegraphics[width=5cm]{leakyrelu}
     \caption{Leaky-Relu 激活函数示意图}
     \label{fig:leakyrelu}
 \end{figure}
+LeakyRelu激活函数会保留所有为正值的数据，相较于Relu激活函数将所有输入的负值以0输出，LeakyRelu会保留一定的负值输出。
+
 
 每一个训练复合物样本都具有复合物类别以及相似性评分两项数据，针对这两项属性，本文实验中分别设置了两项损失函数，使用交叉熵损失（Cross Entropy Loss）计算复合物类别分类损失，使用BCE损失（Binary Cross Entropy Loss）计算复合物得分回归损失。由于两项损失在数值上的差异，设置了相应的损失平衡系数。具体损失计算如下所示。
 \begin{equation}
@@ -83,13 +127,11 @@
 \end{equation}
 其中，$PL$为预测类别，$TL$为真实类别，$PS$为预测评分，$TS$为真实评分，$\alpha$为损失平衡系数。
 
-模型测试阶段，本文将复合物生成算法A在$PIN$网络中运行得到算法A预测的复合物$Complexes_A$，用腹黑谁分类模型筛选所有预测结果，其中如果预测样本在筛选模型中被分类为真样本或者评分高于0.25时，预测样本即可通过筛选。最后所有通过筛选的复合物形成复合物集合$Complexes_A'$。最后使用F1值和PPV指标评估$Complexes_A$和$Complexes_A'$的复合物质量。
+\subsection{评估指标}
+\label{subsection:allExperienceDesign:metrix}
+
+模型测试阶段，本文将复合物生成算法A在$PIN$网络中运行得到算法A预测的复合物$Complexes_A$，用复合物分类模型筛选所有预测结果，其中如果预测样本在筛选模型中被分类为真样本或者评分高于0.25时，预测样本即可通过筛选。最后所有通过筛选的复合物形成复合物集合$Complexes_A'$。最后使用F1值和PPV指标评估$Complexes_A$和$Complexes_A'$的复合物质量。
 评价复合物预测结果的常用指标为精准率（precision）、召回率（recall）和F1值（F1-score）。预测复合物和标准复合物计算邻居相似性（NA-similarity）\ref{equ:compComplexSim:NA}。
-\begin{equation}
-    \label{equ:compComplexSim:NA}
-    NA_{(\mathcal{P} ,\mathcal{Q} )} = \frac{{\left\lvert V_{\mathcal{P}} \cap V_{\mathcal{Q}}\right\rvert}^2 }{{\left\lvert V_{\mathcal{P}} \right\rvert}\cdot  {\left\lvert V_{\mathcal{Q}} \right\rvert}}
-\end{equation}
-其中$\mathcal{P}=(V_{\mathcal{P}} ,E_{\mathcal{P}})$是预测复合物，$V_{\mathcal{P}}$为复合物中的蛋白质，$E_{\mathcal{P}}$为复合物中的相互作用，$\mathcal{Q}=(V_{\mathcal{Q}} ,E_{\mathcal{Q}})$是标准复合物。
 
 按照一般性标准，邻居相似性大于0.25时，预测复合物和标准复合物具有匹配性，表示复合物预测成功。
 精准率计算如公式\ref{equ:precision}所示。
@@ -175,8 +217,7 @@ Acc值综合考虑了Sn值和PPV值的结果，能更全面的反应预测复合
     \caption{DIP网络不同模型处理后结果对比}
     \label{fig:result/DIP/node}
 \end{figure}
-
-从图中可以看出在DIP网络中随机GCN筛选和基于拓扑GCN筛选可能导致F1值的降低和评价指标的降低，这个原因可能是简单模型在学习的过程中会直接学习直观的拓扑关系，导致分类的错误率较高，在筛选过程中会错误的剔除正样本，导致筛选之后样本质量反而降低。
+从图\ref{fig:result/DIP/node}可以看出在DIP网络中随机GCN筛选和基于拓扑GCN筛选可能导致F1值的降低和评价指标的降低，这个原因可能是简单模型在学习的过程中会直接学习直观的拓扑关系，导致分类的错误率较高，在筛选过程中会错误的剔除正样本，导致筛选之后样本质量反而降低。
 
 全局特征的GCN筛选方法，在三个方法中均取得了最佳的F1值和SPA值，证明了全局特征的有效性。
 
@@ -192,11 +233,58 @@ Acc值综合考虑了Sn值和PPV值的结果，能更全面的反应预测复合
     \label{fig:result/Biogrid/node}
 \end{figure}
 
-从图中可以看出全局特征的GCN筛选对Clique算法的提升十分显著，原因是Clique算法是一种基于3-clique结构挖掘复合物的算法，该算法是一种基于密集连边发现复合物的算法，在Biogrid网络中，网络密度相较于DIP网络高了5.2，因此在Biogrid网络中，Clique算法会相应的产生更多的样本，从而为算法优化提供空间。
+从图\ref{fig:result/Biogrid/node}中可以看出全局特征的GCN筛选对Clique算法的提升十分显著，原因是Clique算法是一种基于3-clique结构挖掘复合物的算法，该算法是一种基于密集连边发现复合物的算法，在Biogrid网络中，网络密度相较于DIP网络高了5.2，因此在Biogrid网络中，Clique算法会相应的产生更多的样本，从而为算法优化提供空间。
 
 从上述结果可以得出。全局特征的GCN筛选方法对原始的样本数据的评价指标都有不同程度的提升。
+
+图\ref{fig:result/DIP/node}和图\ref{fig:result/Biogrid/node}的数据如下所示。
+\begin{table}[h]
+    \centering
+    \caption{DIP网络不同模型处理后结果对比数据}
+    \begin{tabular}{C{2cm}C{2cm}C{2cm}C{2cm}C{2cm}}
+        \toprule
+        \textbf{F1值} & \textbf{原始数据} & \textbf{随机GCN筛选} & \textbf{拓扑方法筛选} & \textbf{全局特征GCN筛选} \\
+        \midrule
+        Dpclus算法    & 0.414             & 0.352                & 0.328                 & 0.434                    \\
+        Clique算法    & 0.296             & 0.222                & 0.238                 & 0.477                    \\
+        IPCA算法      & 0.291             & 0.300                & 0.310                 & 0.336                    \\
+        \bottomrule
+    \end{tabular}
+    \begin{tabular}{C{2cm}C{2cm}C{2cm}C{2cm}C{2cm}}
+        \toprule
+        \textbf{SPA值} & \textbf{原始数据} & \textbf{随机GCN筛选} & \textbf{拓扑方法筛选} & \textbf{全局特征GCN筛选} \\
+        \midrule
+        Dpclus算法     & 1.333             & 1.340                & 1.330                 & 1.424                    \\
+        Clique算法     & 0.658             & 0.596                & 0.656                 & 0.815                    \\
+        IPCA算法       & 0.794             & 0.729                & 0.744                 & 0.922                    \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \caption{Biogrid网络不同模型处理后结果对比数据}
+    \begin{tabular}{C{2cm}C{2cm}C{2cm}C{2cm}C{2cm}}
+        \toprule
+        \textbf{F1值} & \textbf{原始数据} & \textbf{随机GCN筛选} & \textbf{拓扑方法筛选} & \textbf{全局特征GCN筛选} \\
+        \midrule
+        Dpclus算法    & 0.425             & 0.444                & 0.254                 & 0.470                    \\
+        Clique算法    & 0.202             & 0.216                & 0.196                 & 0.372                    \\
+        IPCA算法      & 0.293             & 0.123                & 0.331                 & 0.365                    \\
+        \bottomrule
+    \end{tabular}
+    \begin{tabular}{C{2cm}C{2cm}C{2cm}C{2cm}C{2cm}}
+        \toprule
+        \textbf{SPA值} & \textbf{原始数据} & \textbf{随机GCN筛选} & \textbf{拓扑方法筛选} & \textbf{全局特征GCN筛选} \\
+        \midrule
+        Dpclus算法    & 1.796             & 1.187                & 1.382                 & 1.871                    \\
+        Clique算法    & 0.901             & 0.532                & 0.675                 & 1.009                    \\
+        IPCA算法      & 0.859             & 0.886                & 0.810                 & 0.970                    \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 \section{本章小结}
 \label{section:NodeConv:summary}
 
-本章基于拓扑结构出发，探讨了仅仅使用拓扑结构数据的基础上，复合物筛选模型可达到的效果提升。提出了利用GAE和Deepwalk特征基于图卷积神经网络的蛋白质复合物子图评分模型，阐述了单层卷积过程以及整体模型的结构。同时本章介绍了本文通用性的实验参数、基础以及评价指标，后续不再做更多介绍。最后本章在基础模型，无特征模型上进行了实验，实验结果表明特征的有效性以及卷积融合结点特征后评价指标达到了最优结果。
+本章基于拓扑结构出发，探讨了仅仅使用拓扑结构数据的基础上，复合物筛选模型可达到的效果提升。提出了利用GAE和Deepwalk特征基于图卷积神经网络的蛋白质复合物子图评分模型，阐述了单层卷积过程以及整体模型的结构。同时本章介绍了本文通用性的实验参数、基础以及评价指标。最后本章在基础模型，无特征模型上进行了实验，实验结果表明特征的有效性以及卷积融合结点特征后评价指标达到了最优结果。

@@ -168,7 +168,7 @@ Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并
 
 编码过程采用3层GCN网络，第一层GCN网络的特征转换矩阵为$\mathbb{R} ^{1\times 64}$，第二层GCn网络的特征转换矩阵为$\mathbb{R} ^{64\times 64}$，第三层GCn网络的特征转换矩阵为$\mathbb{R} ^{64\times 16}$，即最终得到的结点隐层表示维度为16维，整个网络中结点的隐层特征为$\mathbb{R} ^{n\times 16}$。
 采用三层GCN网络可以使得结点可以获取3跳之外的邻居信息，通过GCN融合到一起就可以整个直径范围为7的信息，通过\ref{tab:PPIStatic}的统计可以得出，不同的$PIN$的全局图直径在6~12，因此这个卷积方法可以融合至少半个图结构范围的信息，一定程度上可以体现结点的全局拓扑特征。
-在每层GCN中，模型采用了Relu函数作为激活函数，同时模型采用了全局0.1的Dropout，一定程度上防止模型的过拟合。
+在每层GCN中，模型采用了LeakyRelu函数作为激活函数，同时模型采用了全局0.1的Dropout，一定程度上防止模型的过拟合。
 
 \begin{figure}[htbp]
     \centering
@@ -210,13 +210,12 @@ Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并
         $G$: PIN graph struct data;
         $A$: adjacent matrix of $G$;
         $i$: epoch index;
-        $Dec$: Multi-layer perceptifier;
         $n$: node num in PIN;
         \Ensure
         $F$: $\mathbb{R}^{n\times 16}$ node feat after GAE Process;
-        \State initial nodefeat=1, $F_0$;initial i=0;
+        \State initial nodefeat=1, $F_0$;initial i=0;initial $Dec$: Multi-layer perceptifier,$GCN$: node-base graph convolution network;
         \Repeat
-        \State compute hidden feat 1, $F_1=GCN(G,F_0)$,$F_0:\mathbb{R}^{n\times 64}$,$F_1:\mathbb{R}^{n\times 64}$;
+        \State compute hidden feat 1, $F_1=GCN(G,F_0)$,$F_0:\mathbb{R}^{n\times 1}$,$F_1:\mathbb{R}^{n\times 64}$;
         \State compute hidden feat 2, $F_2=GCN(G,F_1)$,$F_2:\mathbb{R}^{n\times 64}$;
         \State compute hidden feat 3, $F_3=GCN(G,F_1)$,$F_3:\mathbb{R}^{n\times 16}$;
         \State $L=F_3$,extract hidden node feats;
@@ -232,7 +231,8 @@ Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并
         \State extract node feats in final epoch to $F$, $F$=$L$;
     \end{algorithmic}
 \end{algorithm}
-第一行
+算法中输入包括蛋白质相互作用网络的图结构G以及其邻接矩阵A，GAE的运行轮数为80。第1行表示GAE的初始化，包括初始化结点特征为常数1，初始化轮数为0，以及其中编码器和解码器的参数初始化。
+第3行至14行表示具体的GAE过程，其中3、4、5行为三层GCN组成的编码器，第6行表示取最后一层隐层特征作为结点编码，第7至11行表示解码得到G中每一条邻边的权重，第12行和13行为计算损失和进行GAE的优化，第16行表示最终的GAE结果为最后一个epoch的隐层特征。
 
 
 \subsubsection{基于Deepwalk的结点特征嵌入}
@@ -569,6 +569,7 @@ COACH算法是一种基于密集子图发现的蛋白质复合物预测算法，
         \bottomrule
     \end{tabular}
 \end{table}
+
 其中Dpclus算法中D\_THRESHOLD参数设置为0.9，CP\_THRESHOLD参数设置为0.5；在Clique算法中使用了默认参数；在IPCA算法中T\_IN参数设置为0.5。在这些参数条件下，分别在Krogan网络和DIP网络中运行上述的复合物预测算法，可以得出对应的复合物预测结果如表中所示。
 
 \section{本章小结}

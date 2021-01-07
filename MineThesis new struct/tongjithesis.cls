@@ -6,6 +6,7 @@
 \def\tongjithesis{\textsc{TongjiThesis}}
 \def\version{2}
 
+\RequirePackage{url}
 
 \RequirePackage{kvoptions}
 \SetupKeyvalOptions{
@@ -45,12 +46,10 @@
 \DeclareBoolOption{electronic}
 % 论文是否保密
 \DeclareBoolOption{secret}%
-% 目录中英文是否用 Times new roman 字体（默认关闭）
-%\DeclareBoolOption{romantoc}
-% 章节标题中的英文以及标号是否用 Times new roman 字体（默认打开）
-
-\DeclareBoolOption{romantitle}
-\IfFileExists{/dev/null}{}{\PassOptionsToClass{fontset=windowsold}{ctexbook}}  %simhei字体
+% 目录中英文是否用 Arial 字体（默认关闭）
+\DeclareBoolOption{arialtoc}
+% 章节标题中的英文是否用 Arial 字体（默认打开）
+\DeclareBoolOption{arialtitle}
 
 % 以往，为LATEX 文档配置中文支持是一件相当繁琐的事情。默认情况下，CTEX 宏集能自
 % 动检测用户使用的编译方式和操作系统，选择合适的底层支持和字库，从而简化配置过程。
@@ -74,7 +73,7 @@
 \kvsetkeys{tongji}{
   raggedbottom,
   pifootnote,
-  romantitle}
+  arialtitle}
 
 % 解析用户传递过来的选项，并加载 \pkg{ctexbook}。
 % 强制指定一个degree选项。
@@ -182,12 +181,13 @@
 \RequirePackage{booktabs}
 
 % 参考文献引用宏包。使用biblatex包
+
 \iftongji@numeric
-  \RequirePackage[backend=biber,style=gb7714-2015,gbpub=false,isbn=false,doi=false,gbtitlelink=true,url=false,sortlocale=zh__pinyin]{biblatex} 
+  \RequirePackage[backend=biber,style=gb7714-2015,gbpub=false,isbn=false,doi=false,gbtitlelink=true,url=false,sortlocale=zh__pinyin,gbnamefmt=lowercase]{biblatex} 
 \else
   \iftongji@authoryear % 若需使用author-year格式的文献引用，可将style选择为：gb7714-2015ay
-    \RequirePackage[backend=biber,style=gb7714-2015ay,gbpub=false,isbn=false,doi=false,gbtitlelink=true,url=false,sortlocale=zh__pinyin]{biblatex} 
-  \fi
+    \RequirePackage[backend=biber,style=gb7714-2015ay,gbpub=false,isbn=false,doi=false,gbtitlelink=true,url=false,sortlocale=zh__pinyin]{biblatex}
+    \fi
 \fi
 % 参考文献宏包的其他选项：
 % gbpub=false :用于去除参考文献中的出版地不详、出版者不详等信息
@@ -211,9 +211,8 @@
   breaklinks=true,
   colorlinks=false,
   plainpages=false,
-  %pdfpagelabels %将\thepage写入pdf，使得阅读器可以显示‘ii (4 of 40)’ rather than simply ‘4 of 40’. 貌似不设这个选项也行？
-  % pdfborder=0 0 0
-  }
+  pdfpagelabels, %将\thepage写入pdf，使得阅读器可以显示‘ii (4 of 40)’ rather than simply ‘4 of 40’. 貌似不设这个选项也行？
+  pdfborder=0 0 0}
 % 设置 url 样式，与上下文一致
 \urlstyle{same}
 
@@ -228,8 +227,8 @@
 	nomarginpar,%即\marginparwidth=0pt and \marginparsep=0pt
 	left=31.7mm,%注意left=right
 	headheight=5mm,
-	headsep=5.5mm,	%页眉距顶端要求2cm。即25.4-20=5.4
-	footskip=5.5mm}	%\footskip指的是baseline of last line of text andbaseline of footer的距离
+	headsep=5.4mm,	%页眉距顶端要求2cm。即25.4-20=5.4
+	footskip=5.4mm}	%\footskip指的是baseline of last line of text andbaseline of footer的距离
 
 % 利用 \pkg{fancyhdr} 设置页眉页脚
 \RequirePackage{fancyhdr}
@@ -436,9 +435,9 @@
 
 % 章节标题具体设置在.cfg中,各级标题格式设置在本文件后边。
 
-% 如果章节题目中的英文要使用 Times new roman，那么就加上 rmfamily
+% 如果章节题目中的英文要使用 arial，那么就加上 \cs{sffamily}
 \def\tongji@title@font{%
-  \iftongji@romantitle\rmfamily\else\heiti\fi}
+  \iftongji@arialtitle\sffamily\else\heiti\fi}
 
 
 % \pkg{fancyhdr} 定义页眉页脚很方便，但是有一个非常隐蔽的坑。通过 \pkg{fancyhdr}
@@ -583,9 +582,9 @@
   \xiaosi[1.5]\@starttoc{toc}\normalsize\clearpage}
 % 同济要求目录的行距为18磅
 % 调整目录样式，允许指定目录字体。
-%\iftongji@arialtoc
-%  \def\tongji@toc@font{\sffamily}
-%\fi
+\iftongji@arialtoc
+  \def\tongji@toc@font{\sffamily}
+\fi
 
 % 调整目录特殊要求，重定义缩进量
 % 研究生学位论文写作指南中规定：目录中的章标题行居左书写，一级节标题行缩进 1 个

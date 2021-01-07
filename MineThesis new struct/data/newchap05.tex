@@ -31,12 +31,14 @@ MPNN网络的具体实现如式\ref{equ:MPNNPassing}所示。
 
 \section{基于消息传递网络的复合物筛选模型}
 \label{section:MPNN:detail}
+
+本节分别介绍基于消息传递网络单层更新的具体实现，以及基于该单层更新方法构建的蛋白质复合物评价模型，最后介绍复合物筛选模型的总体实现流程。
 \subsection{基于消息传递网络单层更新}
 基于消息传递网络的复合物筛选模型是基于MPNN网络的改进。
 为了使得结点特征和邻边特征具有融合的能力，蛋白质复合物特征融合模型中采用了结点更新邻边，邻边更新结点的方式。在每一层的MPNN过程中，结点t时刻特征更新为邻边t+1时刻特征、邻边t特征更新为结点t+1时刻特征。结点特征的更新具体方法如下所示，其中$Linear$为一层感知器。
 \begin{equation}
     \label{equ:MineMPNNPassing}
-    m_v^{t+1} = \sum_{w \in N_{(v)}}Linear^t(e_{vw}^t)
+    m_v^{t+1} = \frac{\sum_{w \in N_{(v)}}Linear^t(e_{vw}^t)}{\left\lVert N_{(v)}\right\rVert }
 \end{equation}
 
 \begin{equation}
@@ -59,7 +61,7 @@ MPNN网络的具体实现如式\ref{equ:MPNNPassing}所示。
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=14cm]{MPNN/flow}
+    \includegraphics[width=16cm]{MPNN/flow}
     \caption{基于特征融合的分类模型总体流程}
     \label{fig:MPNN/flow}
 \end{figure}
@@ -68,8 +70,47 @@ MPNN网络的具体实现如式\ref{equ:MPNNPassing}所示。
 
 消息传递过程中隐层维度设置为64维，两层消息传递之后，采用了对结点特征MaxPooling和MeanPooling的池化方法以及对邻边MaxPooling和MeanPooling的池化方法。一共可以得出四个池化结果，如图中concat到一起之后的四色特征所示，对结果进行拼接之后，形成的256维的特征代表图整体特征。后续分别为两层感知器和softmax层得到图的分类预测，两层感知器和sigmoid层得到图的评分预测。
 
-\subsection{筛选模型算法流程}
+\subsection{筛选模型算法}
+本节介绍基于消息传递网络的复合物筛选模型的具体算法，包括数据处理，模型训练，样本筛选与结果比对。
+具体如算法\ref{alg:mpnngcn-screen}所示。
 
+\begin{algorithm}[h]
+    \caption{Protein complex screening model based on MPNN convolution} % 名称
+    \label{alg:mpnngcn-screen}
+    \begin{algorithmic}[1]
+        \Require
+        $Com_t$: train protein complexes;
+        $Com_b$: protein complexes before screen;
+        $Com_g$: golden bench protein complexes;
+        $G$: protein-protein interaction network
+        \Ensure
+        $F1_a,F1_b/SPA_a,SPA_b$: predicted protein complexes F1/SPA metrix after and before screen;
+        \State $n$:PIN node number;$m$:PIN edge number;$Com_a=None,layer=2$;
+        \State $F_{N} \in \mathbb{R}^{n\times 82}=Concat(F_{GAE},F_{Deepwalk},F_{Self})$;
+        \State $F_{E} \in \mathbb{R}^{m\times 14}=Concat(F_{GO},F_{DDI},F_{Subcell},F_{Topo})$;
+        \State $Subs_t=Ext(G,F_{N},F_{E},Com_t)$: feated subgraph extract algorithm;
+        \For{i=0;i<epoch;i++}
+        \For{$BSub_t \in Sub_t$} $loss=0$;
+        \For{$Sub_t \in BSub_t$}
+        \For{$l=0;l<layer;l++$}
+        \State $F_{N}^\prime =MLP_m(Mean(Neighbor(F_{E})))$;
+        \State $F_{E}^\prime =MLP_f(Flow(F_{N}))+MLP_s(Source(F_{N}))$;
+        \State $F_{N} =MaxP(F_{N}^\prime,F_{N})$;$F_{E}=MaxP(F_{E}^\prime,F_{E})$;
+        \EndFor
+        \State $F_t=Concat(MeanP(F_{N}),Maxp(F_{N}),MeanP(F_{E}),Maxp(F_{E}))$;
+        \State $PredC_t=MLP_C(F_t)$;$PredS_t=MLP_S(F_t)$;
+        \State $loss+=\{CEL(PredC_t,LabelC_t)+\alpha \cdot BCEL(PredS_t,LabelS_t)\}$
+        \EndFor; optimization $Adam(loss)$;
+        \EndFor
+        \EndFor
+        \State $Subs_b=Ext(G,F_{N},F_{E},Com_b)$: feated subgraph extract algorithm, see in \ref{section:featSubNetworkConstruct:allSample};
+        \For{$Sub_b \in Subs_b$} $PredC_b=MLP_C(F_b)$;$PredS_b=MLP_S(F_b)$;
+        \State $Com_a+=Complex(Sub_b)~if~PredC_b=positive|PredS_b>=0.25$;
+        \EndFor
+        \State $F1_a=F1(Com_a,Com_g),F1_b=F1(Com_b,Com_g)$;
+        \State $SPA_a=SPA(Com_a,Com_g),SPA_b=SPA(Com_b,Com_g)$;
+    \end{algorithmic}
+\end{algorithm}
 \section{实验设计及结果分析}
 \label{section:MPNN:experience}
 为了验证基于消息传递网络的模型的提升，本文对比了前两章分别设计的基于图卷积神经网络的复合物筛选模型和基于邻边卷积网络的复合物筛选模型。
@@ -81,6 +122,8 @@ MPNN网络的具体实现如式\ref{equ:MPNNPassing}所示。
 消息传递模型致力于向PIN网络全局特征以及生物特征融合到一起，分别以结点和邻边的形式嵌入到复合物子图中。相较于单独利用其中一方面的模型具有更好的预测能力。为了验证模型的有效性，本章进行了如下的实现。
 
 实验在DIP和Biogrid网络中分别运行了Dpclus、Clique和IPCA三个复合物生成算法。实验结果如下所示。
+
+\subparagraph*{实验方案（一）} ~
 
 图\ref{fig:result/DIP/fusion}为在DIP网络中，基于结点的全局特征模型、基于邻边的生物特征模型以及特征融合模型筛选之后结果的对比。
 \begin{figure}[htbp]
@@ -95,6 +138,8 @@ MPNN网络的具体实现如式\ref{equ:MPNNPassing}所示。
 \end{figure}
 
 从图\ref{fig:result/DIP/fusion}中可以看出，在DIP网络中，MPNN融合模型在F1的结果中取得了较大的提升，在Dpclus和Clique的数据样本中均得到了最优结果。
+
+\subparagraph*{实验方案（二）} ~
 
 图\ref{fig:result/Biogrid/fusion}为在Biogrid网络中，基于结点的全局特征模型、基于邻边的生物特征模型以及特征融合模型筛选之后结果的对比。
 \begin{figure}[htbp]

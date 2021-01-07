@@ -25,6 +25,8 @@
 \section{基于图卷积神经网络的复合物筛选模型}
 \label{section:NodeConv:detail}
 
+本节分别介绍基于结点卷积单层更新的具体实现，以及基于该单层更新方法构建的蛋白质复合物评价模型，最后介绍复合物筛选模型的总体实现流程。
+
 \subsection{基于结点卷积单层更新}
 
 本文在\ref{subsection:featPPINetwork:nodeFeatConstruct}部分简单介绍了图卷积神经网络。本节介绍在基于图卷积神经网络的复合物筛选模型中单一图卷积网络的计算方法。
@@ -44,7 +46,7 @@
 \end{equation}
 其中$\mathcal{N}(i)$表示结点i的所有邻居，${c_{ij}}$表示结点i和结点j度乘积的平方根，其具体计算为$c_{ij} = \sqrt{|\mathcal{N}(i)|}\sqrt{|\mathcal{N}(j)|}$，$\sigma$表示激活函数，$b^{(l)}$表示卷积过程中的偏移值。
 
-在模型中，偏移值设置为0，激活函数为Relu函数。而在卷积过程中，为了保持结点特征的连续性，每一个子图的结点均添加一条自环，从式中可以得出，添加自环之后，结点特征更新过程中会有一部分信息由自身提供。
+在模型中，偏移值设置为0，激活函数为LeakyRelu函数。而在卷积过程中，为了保持结点特征的连续性，每一个子图的结点均添加一条自环，从式中可以得出，添加自环之后，结点特征更新过程中会有一部分信息由自身提供。
 
 上式为单个结点的更新过程，将子图中所有结点更新一轮之后即完成一层图卷积过程，图中结点特征从第l层更新到第l+1层。
 
@@ -54,7 +56,7 @@
 下面从数据流的层面阐述从特征子图数据到样本评价数据的实现流程。基于全局特征的复合物分类模型总体结构如图\ref{fig:GCN/flow}所示。
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=14cm]{GCN/flow}
+    \includegraphics[width=16cm]{GCN/flow}
     \caption{基于图卷积神经网络的复合物筛选模型总体流程}
     \label{fig:GCN/flow}
 \end{figure}
@@ -66,32 +68,50 @@
 
 分类指标和评分将作为蛋白质复合物的综合评价指标，具体计算方法如\ref{section:NodeConv:allExperienceDesign}中损失函数计算部分所示。
 
-\subsection{筛选模型算法流程}
+\subsection{筛选模型算法}
 
-具体算法如下所示。
+本节介绍基于图卷积神经网络的复合物筛选模型的具体算法，包括数据处理，模型训练，样本筛选与结果比对。
+具体如算法\ref{alg:nodegcn-screen}所示。
 
 \begin{algorithm}[h]
-    \caption{基于图卷积神经网络的复合物筛选模型} % 名称
-    \label{alg::nodeconv}
-    \begin{algorithmic}
+    \caption{Protein complex screening model based on node convolution} % 名称
+    \label{alg:nodegcn-screen}
+    \begin{algorithmic}[1]
         \Require
-        $PIN$:Protein-Protein Interaction Network
-
+        $Com_t$: train protein complexes;
+        $Com_b$: protein complexes before screen;
+        $Com_g$: golden bench protein complexes;
+        $G$: protein-protein interaction network
         \Ensure
-        $F_1$
-        \State initial nodefeat=1, $F_0$;initial i=0;
-        \Repeat
-        \State compute hidden feat 1, $F_1=GCN(G,F_0)$;
-        \State compute hidden feat 2, $F_2=GCN(G,F_1)$;
-        \State compute hidden feat 3, $F_3=GCN(G,F_1)$;
-        \State reconstruct graph, $A^{\prime}=Dec(F_3)$;
-        \State compute loss, $L=MSELoss(A^{\prime},A)$;
-        \State optimization, $Adam(L)$;
-        \State i=i+1;
-        \Until{$i=80$}
-        \State extract node feats to $F$, $F$=$F_3$;
+        $F1_a,F1_b/SPA_a,SPA_b$: predicted protein complexes F1/SPA metrix after and before screen;
+        \State $n$:PIN node number;$Com_a=None$;
+        \State $F_{GAE} \in \mathbb{R}^{n\times 16}=GAE(G)$:compute node feat by GAE algorithm;
+        % \ref{subsection:featPPINetwork:nodeFeatConstruct};
+        \State $F_{Deepwalk} \in \mathbb{R}^{n\times 64}=Deepwalk(G)$:compute node feat by Deepwalk;algorithm;
+        \State $F_{Node} \in \mathbb{R}^{n\times 80}=Concat(F_{GAE},F_{Deepwalk})$;
+        \State $Subs_t=Ext(G,F_{Node},Com_t)$: feated subgraph extract algorithm, see in \ref{section:featSubNetworkConstruct:allSample};
+        \For{i=0;i<epoch;i++}
+        \For{$BSub_t \in Sub_t$} $loss=0$;
+        \For{$Sub_t \in BSub_t$}
+        \State $Sub_t=NodeConv_0(Sub_t)$;
+        \State $Sub_t=NodeConv_1(Sub_t)$;
+        \State $F_t=Concat(Maxp(Sub_t),Meanp(Sub_t)),\mathbb{R}^{n\times 128}$;
+        \State $PredC_t=MLP_C(F_t)$;$PredS_t=MLP_S(F_t)$;
+        \State $loss+=\{CEL(PredC_t,LabelC_t)+\alpha \cdot BCEL(PredS_t,LabelS_t)\}$
+        \EndFor; optimization $Adam(loss)$;
+        \EndFor
+        \EndFor
+        \State $Subs_b=Ext(G,F_{Node},Com_b)$: feated subgraph extract algorithm, see in \ref{section:featSubNetworkConstruct:allSample};
+        \For{$Sub_b \in Subs_b$} $PredC_b=MLP_C(F_b)$;$PredS_b=MLP_S(F_b)$;
+        \State $Com_a+=Complex(Sub_b)~if~PredC_b=positive|PredS_b>=0.25$;
+        \EndFor
+        \State $F1_a=F1(Com_a,Com_g),F1_b=F1(Com_b,Com_g)$;
+        \State $SPA_a=SPA(Com_a,Com_g),SPA_b=SPA(Com_b,Com_g)$;
     \end{algorithmic}
 \end{algorithm}
+在模型算法中输入数据包括本文\ref{{section:featSubNetworkConstruct:allSample}节构造的训练数据集$Com_t$、待筛选数据集$Com_b$以及蛋白质相互作用网络图结构数据，其中训练数据集由蛋白质复合物的正样本数据集，中间样本数据集和负样本数据集构成，训练数据集中每一个蛋白质符合物样本均具有分类标注与评分标注。
+
+模型的输出数据为待筛选数据集筛选之前的所有样本$Com_b$与筛选之后剩余样本$Com_a$的评价指标，评价指标需要参照真实复合物样本集$Com_g$计算，计算的指标包括F1值和综合评价指标SPA。最终的输出为
 
 \section{实验参数与评估指标}
 \label{section:NodeConv:allExperienceDesign}
@@ -108,7 +128,7 @@
 由于训练数据的不平衡性，训练模型之前，数据进行了重采样处理，保持各分类训练样本相等。按照$8:2$的比率分割各分类样本，形成训练集和测试集。在分类模型的训练过程中，观察训练集和测试集的损失函数，根据早停策略得到未过拟合最佳模型。
 由于各项特征数据存在不平衡性，部分数据如蛋白质长度等数值过大，本文将所有的特征数据进行了统一的归一化和标准化处理。
 
-本文采用0.001的学习率，batch大小设置为32，隐层维度为128，模型使用了两层的GCN网络以及两层的分类器。
+本文采用0.001的学习率，batch大小设置为32，隐层维度为64，模型使用了两层的GCN网络以及两层的分类器。
 采用LeakyRelu作为激活函数和AdamOptimizer作为模型优化器。LeakyRelu激活函数如图\ref{fig:leakyrelu}所示。
 
 \begin{figure}[htbp]
@@ -206,6 +226,10 @@ Acc值综合考虑了Sn值和PPV值的结果，能更全面的反应预测复合
     \end{tabular}
 \end{table}
 
+\subparagraph*{实验方案（一）} ~
+
+在稀疏$PIN$网络
+
 图\ref{fig:result/DIP/node}为在DIP网络中，随机结点特征模型、图论拓扑特征模型以及全局特征模型筛选之后结果的对比。
 \begin{figure}[htbp]
     \centering
@@ -220,6 +244,8 @@ Acc值综合考虑了Sn值和PPV值的结果，能更全面的反应预测复合
 从图\ref{fig:result/DIP/node}可以看出在DIP网络中随机GCN筛选和基于拓扑GCN筛选可能导致F1值的降低和评价指标的降低，这个原因可能是简单模型在学习的过程中会直接学习直观的拓扑关系，导致分类的错误率较高，在筛选过程中会错误的剔除正样本，导致筛选之后样本质量反而降低。
 
 全局特征的GCN筛选方法，在三个方法中均取得了最佳的F1值和SPA值，证明了全局特征的有效性。
+
+\subparagraph*{实验方案（二）} ~
 
 图\ref{fig:result/Biogrid/node}为在Biogrid网络中，随机结点特征模型、图论拓扑特征模型以及全局特征模型筛选之后结果的对比。
 \begin{figure}[htbp]
@@ -277,9 +303,9 @@ Acc值综合考虑了Sn值和PPV值的结果，能更全面的反应预测复合
         \toprule
         \textbf{SPA值} & \textbf{原始数据} & \textbf{随机GCN筛选} & \textbf{拓扑方法筛选} & \textbf{全局特征GCN筛选} \\
         \midrule
-        Dpclus算法    & 1.796             & 1.187                & 1.382                 & 1.871                    \\
-        Clique算法    & 0.901             & 0.532                & 0.675                 & 1.009                    \\
-        IPCA算法      & 0.859             & 0.886                & 0.810                 & 0.970                    \\
+        Dpclus算法     & 1.796             & 1.187                & 1.382                 & 1.871                    \\
+        Clique算法     & 0.901             & 0.532                & 0.675                 & 1.009                    \\
+        IPCA算法       & 0.859             & 0.886                & 0.810                 & 0.970                    \\
         \bottomrule
     \end{tabular}
 \end{table}

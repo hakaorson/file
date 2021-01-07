@@ -32,7 +32,7 @@
 
 \section{基于邻边卷积网络的复合物筛选模型}
 \label{section:EdgeConv:detail}
-
+本节分别介绍基于邻边卷积单层更新的具体实现，以及基于该单层更新方法构建的蛋白质复合物评价模型，最后介绍复合物筛选模型的总体实现流程。
 
 \subsection{基于邻边卷积单层更新}
 
@@ -60,10 +60,10 @@
 蛋白质生物数据是基于邻边的数据，因此在对复合物子图做图卷积的时候，基于生物特征的模型采用了基于edge的GCN模型\cite{wang_dynamic_2019}，其具体的邻边更新方式如式\ref{equ:EdgeConv}所示。
 \begin{equation}
     \label{equ:EdgeConv}
-    h_i^{(l+1)} = \max_{j \in \mathcal{N}(i)} \mathrm{ReLU}(
+    h_i^{(l+1)} = \max_{j \in \mathcal{N}(i)} \mathrm{LeakyReLU}(
     \Theta \cdot (h_j^{(l)} - h_i^{(l)}) + \Phi \cdot h_i^{(l)})
 \end{equation}
-其中$h_i^{(l+1)}$表示第$l+1$层更新之后的结点数据，$h_j^{(l)} - h_i^{(l)}$表示从邻居结点到$i$结点的数据流，$h_i^{(l)}$为结点保留信息，$\Theta$和$\Phi$分别对应更新函数。$Relu$为激活函数。
+其中$h_i^{(l+1)}$表示第$l+1$层更新之后的结点数据，$h_j^{(l)} - h_i^{(l)}$表示从邻居结点到$i$结点的数据流，$h_i^{(l)}$为结点保留信息，$\Theta$和$\Phi$分别对应更新函数。$LeakyRelu$为激活函数。
 
 每一轮基于edgeConv的卷积过程可以如下所示，首先是由结点更新邻边特征的过程，如图中上半部分所示，然后是用更新之后的邻边特征聚合物新的结点特征，如图中下半部分所示。
 
@@ -76,7 +76,7 @@
 
 \subsection{特征子图评价模型}
 
-本文处理了大量的生物学数据，包括蛋白质功能注释数据、结构域相互作用数据、亚细胞定位数据等，应用相关的生物领域的处理方法将生物学数据转换为可应用的特征数据，最终得到了12维度的特征数据。所有的特征都描述蛋白质相互作用，因此在图结构中，这些特征编码为图结构邻边的特征。
+本文处理了大量的生物学数据，包括蛋白质功能注释数据、结构域相互作用数据、亚细胞定位数据等，应用相关的生物领域的处理方法将生物学数据转换为可应用的特征数据，最终得到了11维度的特征数据。所有的特征都描述蛋白质相互作用，因此在图结构中，这些特征编码为图结构邻边的特征。
 基于邻边卷积特征的复合物筛选模型总体流程如图\ref{fig:EdgeConv/flow}所示。
 
 第一阶段如标号1所示，需要将初始的邻边特征以汇聚方法初始化结点特征，如图中上半部分所示。该汇聚方法为初始结点特征由其周围所有邻边特征的平均值替代。其具体的计算过程如公式\ref{equ:EdgetoNodeFeat}所示，其中激活函数为直接映射。其过程可被视为聚合阶段的基于边卷积神经网络过程，如图中\ref{fig:EdgeConv/edgeconv}下半部分所示。
@@ -89,13 +89,50 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=14cm]{EdgeConv/flow}
+    \includegraphics[width=16cm]{EdgeConv/flow}
     \caption{基于邻边卷积特征的复合物筛选模型总体流程}
     \label{fig:EdgeConv/flow}
 \end{figure}
 
-\subsection{筛选模型算法流程}
+\subsection{筛选模型算法}
+本节介绍基于邻边卷积的复合物筛选模型的具体算法，包括数据处理，模型训练，样本筛选与结果比对。
+具体如算法\ref{alg:edgegcn-screen}所示。
 
+\begin{algorithm}[h]
+    \caption{Protein complex screening model based on edge convolution} % 名称
+    \label{alg:edgegcn-screen}
+    \begin{algorithmic}[1]
+        \Require
+        $Com_t$: train protein complexes;
+        $Com_b$: protein complexes before screen;
+        $Com_g$: golden bench protein complexes;
+        $G$: protein-protein interaction network
+        \Ensure
+        $F1_a,F1_b/SPA_a,SPA_b$: predicted protein complexes F1/SPA metrix after and before screen;
+        \State $n$:PIN node number;$m$:PIN edge number;$Com_a=None$;
+        \State $F_{GO}\in \mathbb{R}^{m\times 2},F_{DDI}\in \mathbb{R}^{m\times 7},F_{Subcell}\in \mathbb{R}^{m\times 2},F_{Topo}\in \mathbb{R}^{m\times 1}$;
+        \State $F_{E} \in \mathbb{R}^{m\times 12}=Concat(F_{GO},F_{DDI},F_{Subcell},F_{Topo})$;
+        \State $Subs_t=Ext(G,F_{E},Com_t)$: feated subgraph extract algorithm;
+        \For{i=0;i<epoch;i++}
+        \For{$BSub_t \in Sub_t$} $loss=0$;
+        \For{$Sub_t \in BSub_t$}
+        \State $F_{N}^0 =MLP_m(Mean(Neighbor(F_{E}))), \in \mathbb{R}^{m\times 12}$;
+        \State $F_{N}^1=EdgeConv(G,F_{N}^0), \in \mathbb{R}^{m\times 64}$
+        \State $F_{N}^2=EdgeConv(G,F_{N}^1), \in \mathbb{R}^{m\times 64}$
+        \State $F_t=Concat(MeanP(F_{N}^2),Maxp(F_{N}^2)), \in \mathbb{R}^{m\times 128}$;
+        \State $PredC_t=MLP_C(F_t),\in \mathbb{R}^{1\times 4}$;$PredS_t=MLP_S(F_t),\in \mathbb{R}^{1}$;
+        \State $loss+=\{CEL(PredC_t,LabelC_t)+\alpha \cdot BCEL(PredS_t,LabelS_t)\}$
+        \EndFor; optimization $Adam(loss)$;
+        \EndFor
+        \EndFor
+        \State $Subs_b=Ext(G,F_{E},Com_b)$: feated subgraph extract algorithm, see in \ref{section:featSubNetworkConstruct:allSample};
+        \For{$Sub_b \in Subs_b$} $PredC_b=MLP_C(F_b)$;$PredS_b=MLP_S(F_b)$;
+        \State $Com_a+=Complex(Sub_b)~if~PredC_b=positive|PredS_b>=0.25$;
+        \EndFor
+        \State $F1_a=F1(Com_a,Com_g),F1_b=F1(Com_b,Com_g)$;
+        \State $SPA_a=SPA(Com_a,Com_g),SPA_b=SPA(Com_b,Com_g)$;
+    \end{algorithmic}
+\end{algorithm}
 \section{实验设计及结果分析}
 \label{section:EdgeConv:experience}
 
@@ -111,8 +148,12 @@
     \label{fig:result/DIP/edge}
 \end{figure}
 
+\subparagraph*{实验方案（一）} ~
+
 图\ref{fig:result/DIP/edge}为在DIP网络中，随机特征模型和基于生物特征的模型筛选之后结果的对比。
 从图中可以看出，添加了生物特征后，在DIP网络中复合物的生成质量得到了相应的提升，同样的由于CLique算法的特征，该算法的前后对比提升幅度最为明显。
+
+\subparagraph*{实验方案（二）} ~
 
 图\ref{fig:result/Biogrid/edge}为在Biogrid网络中，随机特征模型和基于生物特征的模型筛选之后结果的对比。
 \begin{figure}[htbp]

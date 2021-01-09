@@ -99,7 +99,7 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=16cm]{EdgeConv/flow}
+    \includegraphics[width=15cm]{EdgeConv/flow}
     \caption{基于邻边卷积特征的复合物筛选模型总体流程}
     \label{fig:EdgeConv/flow}
 \end{figure}
@@ -155,7 +155,7 @@
 第11行表示图读出过程，由于在该模型中邻边特征初始化为了结点特征，同时结点特征经过两层邻边卷积神经网络已经和子图拓扑结构进行了融合，此时结点特征具有较强的表达能力，隐层隐层图读出采用所有结点隐层特征的最大池化$Maxp$和平均池化$Meanp$拼接$Concat$作为子图的特征。
 
 第12行表示以基于子图特征的分类预测与评分预测。
-第18行至第22行表示基于以训练模型筛选蛋白质复合物样本以及评价阶段。其具体细节如\ref{alg:nodegcn-screen}所述。
+第18行至第22行表示基于以训练模型筛选蛋白质复合物样本以及评价阶段。其具体细节如算法\ref{alg:nodegcn-screen}描述所述。
 
 
 \section{实验设计及结果分析}
@@ -167,7 +167,6 @@
 
 在本文介绍的四个$PPI$网络中，DIP网络的密度最低，为0.0014，其平均度数最低6.98，具有一定的稀疏性。且DIP网络的结点数量较多，为4928个，仅次于Biogrid网络，数据完整性较高。因此方案（一）选择DIP网络作为稀疏网络进行相关实验。
 
-实验在DIP和Biogrid网络中分别运行了Dpclus、Clique和IPCA三个复合物生成算法。实验结果如下所示。
 \begin{figure}[htbp]
     \centering
     \subcaptionbox{F1值对比}{\label{fig:result/DIP/F1/edge}
@@ -178,9 +177,6 @@
     \caption{DIP网络不同模型处理后结果对比}
     \label{fig:result/DIP/edge}
 \end{figure}
-
-图\ref{fig:result/DIP/edge}为在DIP网络中，随机特征模型和基于生物特征的模型筛选之后结果的对比。
-从图中可以看出，添加了生物特征后，在DIP网络中复合物的生成质量得到了相应的提升，同样的由于CLique算法的特征，该算法的前后对比提升幅度最为明显。
 
 \begin{table}[h]
     \centering
@@ -203,14 +199,21 @@
         IPCA算法       & 0.794             & 0.729                & 0.838                               \\
         \bottomrule
     \end{tabular}
+    \label{tab:result/DIP/edge}
 \end{table}
+
+依据\ref{section:NodeConv:experience}部分中实验方案（一）中提到的方法，针对DIP网络构造了具有四类分类的训练特征子图数据集，基于三种方法生成了待筛选复合物数据集。实验中在训练特征子图数据集基础上训练了基于邻边卷积网络的评价模型。模型训练完成之后，分别对三个待筛选特征子图样本数据集中的样本进行了测试并将其中符合要求的复合物保留下来，作为筛选后样本数据集。接下来分别对比了筛选前后样本数据集F1值和综合评价指标。
+
+按照以上的实验方法本章对比了基于随机邻边特征的邻边卷积模型，随机邻边特征模型的对比可以确定嵌入的邻边相似性特征的有效性，本章总体的实验结果如下所示。
+
+图\ref{fig:result/DIP/edge}为在DIP网络中，随机特征模型和基于生物特征的模型筛选之后结果的对比，包含了F1值对比图和SPA值对比图。表\ref{tab:result/DIP/edge}为实验结果具体数据。
 
 
 \subparagraph*{实验方案（二）} 稠密网络中基于邻边卷积筛选模型实验
 
-在本文介绍的四个$PPI$网络中，Biogrid网络的密度最低，为0.0038，其平均度数最低21.40，远高于其他$PPI$网络，相较于其他网络Biogrid网络稠密性较高。且Biogrid网络的具有最高的结点数量，数据为5573。因此方案（二）选择Biogrid网络作为稠密网络进行相关实验。
+在本文介绍的四个$PPI$网络中，Biogrid网络的密度最高，为0.0038，其平均度数最低21.40，远高于其他$PPI$网络，相较于其他网络Biogrid网络稠密性较高。且Biogrid网络的具有最高的结点数量，数据为5573。因此方案（二）选择Biogrid网络作为稠密网络进行相关实验。
 
-图\ref{fig:result/Biogrid/edge}为在Biogrid网络中，随机特征模型和基于生物特征的模型筛选之后结果的对比。
+
 \begin{figure}[htbp]
     \centering
     \subcaptionbox{F1值对比}{\label{fig:result/Biogrid/F1/edge}
@@ -221,9 +224,6 @@
     \caption{Biogrid网络不同模型处理后结果对比}
     \label{fig:result/Biogrid/edge}
 \end{figure}
-从图\ref{fig:result/Biogrid/edge}中可以看出添加了生物特征后，Biogrid网络相应样本的F1值均有较为明显的提升，而Clique算法的样本提升最为明显。综合评价指标SPA值也具有一定的提升。
-
-图\ref{fig:result/DIP/edge}和图\ref{fig:result/Biogrid/edge}的数据如下所示。
 
 \begin{table}[h]
     \centering
@@ -246,10 +246,24 @@
         IPCA算法       & 0.859             & 0.886                & 0.891                               \\
         \bottomrule
     \end{tabular}
+    \label{tab:result/Biogrid/edge}
 \end{table}
+
+
+依据\ref{section:NodeConv:experience}部分中实验方案（二）中提到的方法，针对Bigrid网络构造了具有四类分类的训练特征子图数据集，基于三种方法生成了待筛选复合物数据集。实验中训练了基于邻边卷积网络的评价模型，并分别对三个待筛选特征子图样本数据集中的样本进行了测试，获取了筛选后样本数据集，最后对比了筛选前后样本数据集F1值和综合评价指标。
+
+按照以上的实验方法本章对比了基于随机邻边特征的邻边卷积模型，随机邻边特征模型的对比可以确定嵌入的邻边相似性特征的有效性，本章总体的实验结果如下所示。
+图\ref{fig:result/Biogrid/edge}为在Biogrid网络中，随机特征模型和基于生物特征的模型筛选之后结果的对比，包含了F1值对比图和SPA值对比图。表\ref{tab:result/Biogrid/edge}为实验结果具体数据。
+
+\subparagraph*{实验结论} ~
+
+从实验方案（一）从图中可以看出，添加了生物特征后，在DIP网络中复合物的生成质量得到了相应的提升，同样的由于CLique算法的特性，该算法的前后对比提升幅度最为明显。
+和实验方案（二）从图\ref{fig:result/Biogrid/edge}中可以看出添加了生物特征后，Biogrid网络相应样本的F1值均有较为明显的提升，而Clique算法的样本提升最为明显。综合评价指标SPA值也具有一定的提升。
+
+基于相似性数据邻边嵌入的复合物筛选模型，对比无相似性嵌入模型取得较高的F1值和SPA值提升，稠密网络具有更多的邻边信息，在稠密网络中其提升幅度更为明显，最高的F1值提升在Biogrid的Clique算法中，从0.203提升至0.510。
 
 
 \section{本章小结}
 \label{section:EdgeConv:summary}
 
-本章基于特征子图中的邻边相似性出发，探讨了仅仅使用生物特征转换为的邻边数据的基础上，复合物筛选模型可达到的效果提升。提出了使用基于邻边卷积的图神经网络方法以及相应的模型，阐述了邻边特征如何初始化结点特征，以及EdgeConv的信息流更新过程。最后本章对比了基础的无特征EdgeConv模型，并进行了实验，实验结果表明了生物特征的有效性以及邻边卷积能较好的处理生物相似性数据。
+本章基于蛋白质相似性特征出发，提出了使用基于邻边卷积的复合物特征子图评价模型以及相应的筛选算法。通过多种蛋白质相似性计算方法为蛋白质复合物子图嵌入11维度的邻边特征，提出了邻边特征初始化结点特征的方法以及蛋白质复合物中基于邻边卷积的信息流更新过程。最后本章对比了基础的无特征邻边卷积模型，实验结果表明了生物相似性特征和筛选模型的有效性以及邻边卷积对特征数据具有融合能力。

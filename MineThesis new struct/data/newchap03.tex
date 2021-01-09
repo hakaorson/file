@@ -57,7 +57,7 @@
 下面从数据流的层面阐述从特征子图数据到样本评价数据的实现流程。基于全局特征的复合物分类模型总体结构如图\ref{fig:GCN/flow}所示。
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=16cm]{GCN/flow}
+    \includegraphics[width=15cm]{GCN/flow}
     \caption{基于图卷积神经网络的复合物筛选模型总体流程}
     \label{fig:GCN/flow}
 \end{figure}
@@ -215,7 +215,7 @@ Acc值综合考虑了Sn值和PPV值的结果，能更全面的反应预测复合
 
 第一个对比的模型是使用随机特征GCN图分类模型，子图GCN网络输入的结点特征为随机数据，通过该模型的对比验证全局特征的有效性。
 
-第二个对比的模型是采用图论拓扑特征的分类模型\ref{fig:entropy-classification}。计算若干维度的图拓扑特征并进行标准化处理，作为子图特征的代表，用于后续多层感知器分类模型的输入。具体特征提取拓扑特征如表\ref{tab:datasets:statisticgraphfeat}所示。
+第二个对比的模型是采用图论拓扑统计特征的分类模型\ref{fig:entropy-classification}。计算若干维度的图拓扑特征并进行标准化处理，作为子图特征的代表，用于后续多层感知器分类模型的输入。具体特征提取拓扑特征如表\ref{tab:datasets:statisticgraphfeat}所示。
 
 \begin{table}[h]
     \centering
@@ -237,7 +237,6 @@ Acc值综合考虑了Sn值和PPV值的结果，能更全面的反应预测复合
 
 在本文介绍的四个$PPI$网络中，DIP网络的密度最低，为0.0014，其平均度数最低6.98，具有一定的稀疏性。且DIP网络的结点数量较多，为4928个，仅次于Biogrid网络，数据完整性较高。因此方案（一）选择DIP网络作为稀疏网络进行相关实验。
 
-图\ref{fig:result/DIP/node}为在DIP网络中，随机结点特征模型、图论拓扑特征模型以及全局特征模型筛选之后结果的对比。
 \begin{figure}[htbp]
     \centering
     \subcaptionbox{F1值对比}{\label{fig:result/DIP/F1/node}
@@ -248,10 +247,7 @@ Acc值综合考虑了Sn值和PPV值的结果，能更全面的反应预测复合
     \caption{DIP网络不同模型处理后结果对比}
     \label{fig:result/DIP/node}
 \end{figure}
-从图\ref{fig:result/DIP/node}可以看出在DIP网络中随机GCN筛选和基于拓扑GCN筛选可能导致F1值的降低和评价指标的降低，这个原因可能是简单模型在学习的过程中会直接学习直观的拓扑关系，导致分类的错误率较高，在筛选过程中会错误的剔除正样本，导致筛选之后样本质量反而降低。
 
-全局特征的GCN筛选方法，在三个方法中均取得了最佳的F1值和SPA值，证明了全局特征的有效性。
-。
 \begin{table}[h]
     \centering
     \caption{DIP网络不同模型处理后结果对比数据}
@@ -273,13 +269,24 @@ Acc值综合考虑了Sn值和PPV值的结果，能更全面的反应预测复合
         IPCA算法       & 0.794             & 0.729                & 0.744                 & 0.922                    \\
         \bottomrule
     \end{tabular}
+    \label{tab:result/DIP/node}
 \end{table}
+
+
+本文在DIP网络中提取了训练特征子图，其组成为正样本特征子图371个，A类中间样本179个，B类中间样本345个以及负样本764个，其具体的构造方法如\ref{section:featSubNetworkConstruct:allSample}所示。接下来在DIP网络中运行Dpclus算法、Clique算法和IPCA算法，分别得到了预测的蛋白质复合物结果，分别为1178、3224和840个样本，接下来分别构造了特征子图，最终形成了三个待筛选特征子图样本数据集。
+
+实验中在训练特征子图数据集基础上训练了基于图卷积神经网络的评价模型。模型训练完成之后，分别对三个待筛选特征子图样本数据集中的样本进行了测试将其中符合要求的复合物保留下来，作为筛选后样本数据集。接下来分别对比了筛选前后样本数据集F1值和综合评价指标。
+
+按照以上的实验方法本章对比了基于随机结点特征模型和基于图论拓扑特征的模型，随机结点特征的对比可以确定嵌入结点特征的有效性，基于图论拓扑特征的模型作为拓扑特征的Base模型，总体的实验结果如下所示。
+
+
+
+图\ref{fig:result/DIP/node}为在DIP网络中，随机结点特征模型、图论拓扑特征模型以及全局特征模型筛选之后结果的对比，包含了F1值对比图和SPA值对比图。表\ref{tab:result/DIP/node}为实验结果具体数据。
 
 \subparagraph*{实验方案（二）} 稠密网络中基于图卷积神经网络筛选模型实验
 
-在本文介绍的四个$PPI$网络中，Biogrid网络的密度最低，为0.0038，其平均度数最低21.40，远高于其他$PPI$网络，相较于其他网络Biogrid网络稠密性较高。且Biogrid网络的具有最高的结点数量，数据为5573。因此方案（二）选择Biogrid网络作为稠密网络进行相关实验。
+在本文介绍的四个$PPI$网络中，Biogrid网络的密度最高，为0.0038，其平均度数最低21.40，远高于其他$PPI$网络，相较于其他网络Biogrid网络稠密性较高。且Biogrid网络的具有最高的结点数量，数据为5573。因此方案（二）选择Biogrid网络作为稠密网络进行相关实验。
 
-图\ref{fig:result/Biogrid/node}为在Biogrid网络中，随机结点特征模型、图论拓扑特征模型以及全局特征模型筛选之后结果的对比。
 \begin{figure}[htbp]
     \centering
     \subcaptionbox{F1值对比}{\label{fig:result/Biogrid/F1/node}
@@ -290,12 +297,6 @@ Acc值综合考虑了Sn值和PPV值的结果，能更全面的反应预测复合
     \caption{Biogrid网络不同模型处理后结果对比}
     \label{fig:result/Biogrid/node}
 \end{figure}
-
-从图\ref{fig:result/Biogrid/node}中可以看出全局特征的GCN筛选对Clique算法的提升十分显著，原因是Clique算法是一种基于3-clique结构挖掘复合物的算法，该算法是一种基于密集连边发现复合物的算法，在Biogrid网络中，网络密度相较于DIP网络高了5.2，因此在Biogrid网络中，Clique算法会相应的产生更多的样本，从而为算法优化提供空间。
-
-从上述结果可以得出。全局特征的GCN筛选方法对原始的样本数据的评价指标都有不同程度的提升。
-
-图\ref{fig:result/DIP/node}和图\ref{fig:result/Biogrid/node}的数据如下所示
 
 \begin{table}[h]
     \centering
@@ -318,9 +319,27 @@ Acc值综合考虑了Sn值和PPV值的结果，能更全面的反应预测复合
         IPCA算法       & 0.859             & 0.886                & 0.810                 & 0.970                    \\
         \bottomrule
     \end{tabular}
+    \label{tab:result/Biogrid/node}
 \end{table}
+
+
+
+本文在Biogrid网络中提取了训练特征子图，其组成为正样本特征子图621个，A类中间样本192个，B类中间样本975个以及负样本819个，其具体的构造方法如\ref{section:featSubNetworkConstruct:allSample}所示。接下来在DIP网络中运行Dpclus算法、Clique算法和IPCA算法，分别得到了预测的蛋白质复合物结果，分别为1078、6250和438个样本，接下来分别构造了特征子图，最终形成了三个待筛选特征子图样本数据集。
+后续其他具体实验细节如方案（一）。
+
+
+
+图\ref{fig:result/Biogrid/node}为在Biogrid网络中，随机结点特征模型、图论拓扑特征模型以及全局特征模型筛选之后结果的对比，包含了F1值对比图和SPA值对比图。表\ref{tab:result/Biogrid/node}为实验结果具体数据。
+
+
+\subparagraph*{实验结论} ~
+
+实验方案（一）中图\ref{fig:result/DIP/node}显示在DIP网络中随机GCN筛选和基于拓扑GCN筛选可能导致F1值的降低和评价指标的降低，原因为简单模型在学习的过程中会直接学习直观的拓扑关系，导致分类的错误率较高，在筛选过程中会错误的剔除正样本，导致筛选之后样本质量反而降低。
+实验方案（二）中图\ref{fig:result/Biogrid/node}显示全局特征的GCN筛选对Clique算法的提升十分显著，Clique算法是一种基于3-clique结构挖掘复合物的算法，该算法是一种基于密集连边发现复合物的算法，在Biogrid网络中，网络密度相较于DIP网络高了5.2，因此在Biogrid网络中，Clique算法会相应的产生更多的样本，从而为算法优化提供空间。
+
+基于全局拓扑数据结点嵌入的复合物筛选模型，在稀疏网络和密集网络中对比的无特征方法、局部拓扑特征方法中均取得了最佳的F1值和SPA值，证明了结点嵌入的复合物筛选模型的有效性。
 
 \section{本章小结}
 \label{section:NodeConv:summary}
 
-本章基于拓扑结构出发，探讨了仅仅使用拓扑结构数据的基础上，复合物筛选模型可达到的效果提升。提出了利用GAE和Deepwalk特征基于图卷积神经网络的蛋白质复合物子图评分模型，阐述了单层卷积过程以及整体模型的结构。同时本章介绍了本文通用性的实验参数、基础以及评价指标。最后本章在基础模型，无特征模型上进行了实验，实验结果表明特征的有效性以及卷积融合结点特征后评价指标达到了最优结果。
+本章基于拓扑结构出发，提出了基于全局拓扑数据嵌入的复合物筛选模型，通过GAE和Deepwalk嵌入结点特征，基于图卷积神经网络的蛋白质复合物子图评分模型将结点特征融合。本章详细阐述了单层卷积过程以及整体模型的结构与算法流程。同时本章介绍了通用性的实验环境、实验参数以及评价指标。最后本章在子图拓扑特征模型，无嵌入图卷积模型并进行了相关实验，实验结果表明了结点嵌入特征和筛选模型的有效性。

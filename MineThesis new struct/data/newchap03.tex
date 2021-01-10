@@ -36,9 +36,9 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=10cm]{GCN/nodeupdate}
+    \includegraphics[width=10cm]{gcn_nodeupdate}
     \caption{结点更新过程中数据流程示意图}
-    \label{fig:GCN/nodeupdate}
+    \label{fig:gcn_nodeupdate}
 \end{figure}
 如图中所示，结点A的特征将有结点$\{A,D,E,H,J\}$共同确定，图中左侧为未更新状态，右侧为更新结点特征过程中的数据流动。其具体过程可以表示为如下的公式。
 \begin{equation}
@@ -54,12 +54,12 @@
 \subsection{特征子图评价模型}
 \label{subsection:NodeConv:flow}
 
-下面从数据流的层面阐述从特征子图数据到样本评价数据的实现流程。基于全局特征的复合物分类模型总体结构如图\ref{fig:GCN/flow}所示。
+下面从数据流的层面阐述从特征子图数据到样本评价数据的实现流程。基于全局特征的复合物分类模型总体结构如图\ref{fig:gcn_flow}所示。
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=15cm]{GCN/flow}
+    \includegraphics[width=15cm]{gcn_flow}
     \caption{基于图卷积神经网络的复合物筛选模型总体流程}
-    \label{fig:GCN/flow}
+    \label{fig:gcn_flow}
 \end{figure}
 模型的初始输入特征结点特征，维度为80维，其中包括基于Deepwalk嵌入特征64维和GAE嵌入特征16维。
 在初始特征之后加入了两层图卷积模型，图卷积模型如\ref{section:NodeConv:detail}所示，图卷积可以融合图中结点特征和拓扑结构对结点特征进行更新。图卷积过程中隐层维度设置为64维。两层图卷积之后，采用了对结点特征MaxPooling和MeanPooling的池化方法。两种池化方法的结果进行拼接之后，形成的128维的特征代表图整体特征，如图中1和2部分所示，1部分代表MaxPooling得到的64维特征，2部分代表通过MeanPooling得到的64维特征。
@@ -239,13 +239,13 @@ Acc值综合考虑了Sn值和PPV值的结果，能更全面的反应预测复合
 
 \begin{figure}[htbp]
     \centering
-    \subcaptionbox{F1值对比}{\label{fig:result/DIP/F1/node}
-        \includegraphics[width=10cm]{result/DIP/F1/node}}
+    \subcaptionbox{F1值对比}{\label{fig:dip_f1_node}
+        \includegraphics[width=10cm]{dip_f1_node}}
     \vskip0.2cm
-    \subcaptionbox{SPA值对比}{\label{fig:result/DIP/SPA/node}
-        \includegraphics[width=10cm]{result/DIP/SPA/node}}
+    \subcaptionbox{SPA值对比}{\label{fig:dip_spa_node}
+        \includegraphics[width=10cm]{dip_spa_node}}
     \caption{DIP网络不同模型处理后结果对比}
-    \label{fig:result/DIP/node}
+    \label{fig:dip_node}
 \end{figure}
 
 \begin{table}[h]
@@ -281,7 +281,7 @@ Acc值综合考虑了Sn值和PPV值的结果，能更全面的反应预测复合
 
 
 
-图\ref{fig:result/DIP/node}为在DIP网络中，随机结点特征模型、图论拓扑特征模型以及全局特征模型筛选之后结果的对比，包含了F1值对比图和SPA值对比图。表\ref{tab:result/DIP/node}为实验结果具体数据。
+图\ref{fig:dip_node}为在DIP网络中，随机结点特征模型、图论拓扑特征模型以及全局特征模型筛选之后结果的对比，包含了F1值对比图和SPA值对比图。表\ref{tab:result/DIP/node}为实验结果具体数据。
 
 \subparagraph*{实验方案（二）} 稠密网络中基于图卷积神经网络筛选模型实验
 
@@ -289,13 +289,13 @@ Acc值综合考虑了Sn值和PPV值的结果，能更全面的反应预测复合
 
 \begin{figure}[htbp]
     \centering
-    \subcaptionbox{F1值对比}{\label{fig:result/Biogrid/F1/node}
-        \includegraphics[width=10cm]{result/Biogrid/F1/node}}
+    \subcaptionbox{F1值对比}{\label{fig:biogrid_f1_node}
+        \includegraphics[width=10cm]{biogrid_f1_node}}
     \vskip0.2cm
-    \subcaptionbox{SPA值对比}{\label{fig:result/Biogrid/SPA/node}
-        \includegraphics[width=10cm]{result/Biogrid/SPA/node}}
+    \subcaptionbox{SPA值对比}{\label{fig:biogrid_spa_node}
+        \includegraphics[width=10cm]{biogrid_spa_node}}
     \caption{Biogrid网络不同模型处理后结果对比}
-    \label{fig:result/Biogrid/node}
+    \label{fig:biogrid_node}
 \end{figure}
 
 \begin{table}[h]
@@ -329,13 +329,13 @@ Acc值综合考虑了Sn值和PPV值的结果，能更全面的反应预测复合
 
 
 
-图\ref{fig:result/Biogrid/node}为在Biogrid网络中，随机结点特征模型、图论拓扑特征模型以及全局特征模型筛选之后结果的对比，包含了F1值对比图和SPA值对比图。表\ref{tab:result/Biogrid/node}为实验结果具体数据。
+图\ref{fig:biogrid_node}为在Biogrid网络中，随机结点特征模型、图论拓扑特征模型以及全局特征模型筛选之后结果的对比，包含了F1值对比图和SPA值对比图。表\ref{tab:result/Biogrid/node}为实验结果具体数据。
 
 
 \subparagraph*{实验结论} ~
 
-实验方案（一）中图\ref{fig:result/DIP/node}显示在DIP网络中随机GCN筛选和基于拓扑GCN筛选可能导致F1值的降低和评价指标的降低，原因为简单模型在学习的过程中会直接学习直观的拓扑关系，导致分类的错误率较高，在筛选过程中会错误的剔除正样本，导致筛选之后样本质量反而降低。
-实验方案（二）中图\ref{fig:result/Biogrid/node}显示全局特征的GCN筛选对Clique算法的提升十分显著，Clique算法是一种基于3-clique结构挖掘复合物的算法，该算法是一种基于密集连边发现复合物的算法，在Biogrid网络中，网络密度相较于DIP网络高了5.2，因此在Biogrid网络中，Clique算法会相应的产生更多的样本，从而为算法优化提供空间。
+实验方案（一）中图\ref{fig:dip_node}显示在DIP网络中随机GCN筛选和基于拓扑GCN筛选可能导致F1值的降低和评价指标的降低，原因为简单模型在学习的过程中会直接学习直观的拓扑关系，导致分类的错误率较高，在筛选过程中会错误的剔除正样本，导致筛选之后样本质量反而降低。
+实验方案（二）中图\ref{fig:biogrid_node}显示全局特征的GCN筛选对Clique算法的提升十分显著，Clique算法是一种基于3-clique结构挖掘复合物的算法，该算法是一种基于密集连边发现复合物的算法，在Biogrid网络中，网络密度相较于DIP网络高了5.2，因此在Biogrid网络中，Clique算法会相应的产生更多的样本，从而为算法优化提供空间。
 
 基于全局拓扑数据结点嵌入的复合物筛选模型，在稀疏网络和密集网络中对比的无特征方法、局部拓扑特征方法中均取得了最佳的F1值和SPA值，证明了结点嵌入的复合物筛选模型的有效性。
 

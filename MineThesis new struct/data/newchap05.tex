@@ -69,12 +69,12 @@ MPNN网络的具体实现如式\ref{equ:MPNNPassing}所示。
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=15cm]{MPNN/flow}
+    \includegraphics[width=15cm]{mpnn_flow}
     \caption{基于特征融合的分类模型总体流程}
-    \label{fig:MPNN/flow}
+    \label{fig:mpnn_flow}
 \end{figure}
 
-在模型中，添加了两层结点和邻边同时更新的MPNN网络，如图\ref{fig:MPNN/flow}所示。每一层MPNN网络中，结点特征更新由结点以及结点周围邻边特征共同确定，如示意图中的结点特征矩阵隐层的数据流所示，过程3是表示通过结点的邻边特征汇聚到一起，再结合过程4结点本身继承上一步的特征，其具体的计算方法如公式\ref{equ:MineMPNNnup}所示。邻边特征更新由邻边以及邻边两侧端点的结点特征共同确定，如示意图中的邻边特征矩阵隐层的数据流所示，过程2表示邻边特征由其源点和汇点特征共同计算，过程1表示邻边特征继承上一步的特征，其具体的计算方法如公式\ref{equ:MineMPNNeup}所示。
+在模型中，添加了两层结点和邻边同时更新的MPNN网络，如图\ref{fig:mpnn_flow}所示。每一层MPNN网络中，结点特征更新由结点以及结点周围邻边特征共同确定，如示意图中的结点特征矩阵隐层的数据流所示，过程3是表示通过结点的邻边特征汇聚到一起，再结合过程4结点本身继承上一步的特征，其具体的计算方法如公式\ref{equ:MineMPNNnup}所示。邻边特征更新由邻边以及邻边两侧端点的结点特征共同确定，如示意图中的邻边特征矩阵隐层的数据流所示，过程2表示邻边特征由其源点和汇点特征共同计算，过程1表示邻边特征继承上一步的特征，其具体的计算方法如公式\ref{equ:MineMPNNeup}所示。
 
 消息传递过程中隐层维度设置为64维，两层消息传递之后，采用了对结点特征MaxPooling和MeanPooling的池化方法以及对邻边MaxPooling和MeanPooling的池化方法。一共可以得出四个池化结果，如图中concat到一起之后的四色特征所示，对结果进行拼接之后，形成的256维的特征代表图整体特征。后续分别为两层感知器和softmax层得到图的分类预测，两层感知器和sigmoid层得到图的评分预测。感知器的隐层维度均为64维。
 
@@ -155,13 +155,13 @@ MPNN网络的具体实现如式\ref{equ:MPNNPassing}所示。
 
 \begin{figure}[htbp]
     \centering
-    \subcaptionbox{F1值对比}{\label{fig:result/DIP/F1/fusion}
-        \includegraphics[width=10cm]{result/DIP/F1/fusion}}
+    \subcaptionbox{F1值对比}{\label{fig:dip_f1_fusion}
+        \includegraphics[width=10cm]{dip_f1_fusion}}
     \vskip0.2cm
-    \subcaptionbox{SPA值对比}{\label{fig:result/DIP/SPA/fusion}
-        \includegraphics[width=10cm]{result/DIP/SPA/fusion}}
+    \subcaptionbox{SPA值对比}{\label{fig:dip_spa_fusion}
+        \includegraphics[width=10cm]{dip_spa_fusion}}
     \caption{DIP网络不同模型处理后结果对比}
-    \label{fig:result/DIP/fusion}
+    \label{fig:dip_fusion}
 \end{figure}
 
 
@@ -192,7 +192,7 @@ MPNN网络的具体实现如式\ref{equ:MPNNPassing}所示。
 依据\ref{section:NodeConv:experience}部分中实验方案（一）中提到的方法，针对DIP网络构造了具有四类分类的训练特征子图数据集，基于三种方法生成了待点边消息传递网络的评价模型。模型训练完成之后，分别对三个待筛选特征子图样本数据集中的样本进行了测试并将其中符合要求的复合物保留下来，作为筛选后样本数据集。接下来分别对比了筛选前后样本数据集F1值和综合评价指标。
 
 按照以上的实验方法本章对比了第三章提出的基于图卷积神经网络的复合物筛选模型和第四章提出的基于邻边卷积的蛋白质复合物筛选模型，基于消息传递的模型保留了全局结点特征嵌入和相似性特征嵌入，融合模型具有更精确的蛋白质复合物的评价能力，本章总体的实验结果如下所示。
-图\ref{fig:result/DIP/fusion}为在DIP网络中，基于结点的全局特征模型、基于邻边的生物特征模型以及特征融合模型筛选之后结果的对比，包含了F1值对比图和SPA值对比图。表\ref{tab:result/DIP/fusion}为实验结果具体数据。
+图\ref{fig:dip_fusion}为在DIP网络中，基于结点的全局特征模型、基于邻边的生物特征模型以及特征融合模型筛选之后结果的对比，包含了F1值对比图和SPA值对比图。表\ref{tab:result/DIP/fusion}为实验结果具体数据。
 
 \subparagraph*{实验方案（二）} 稠密网络中基于消息传递筛选模型实验
 
@@ -200,13 +200,13 @@ MPNN网络的具体实现如式\ref{equ:MPNNPassing}所示。
 
 \begin{figure}[htbp]
     \centering
-    \subcaptionbox{F1值对比}{\label{fig:result/Biogrid/F1/fusion}
-        \includegraphics[width=10cm]{result/Biogrid/F1/fusion}}
+    \subcaptionbox{F1值对比}{\label{fig:biogrid_f1_fusion}
+        \includegraphics[width=10cm]{biogrid_f1_fusion}}
     \vskip0.2cm
-    \subcaptionbox{SPA值对比}{\label{fig:result/Biogrid/SPA/fusion}
-        \includegraphics[width=10cm]{result/Biogrid/SPA/fusion}}
+    \subcaptionbox{SPA值对比}{\label{fig:biogrid_spa_fusion}
+        \includegraphics[width=10cm]{biogrid_spa_fusion}}
     \caption{Biogrid网络不同模型处理后结果对比}
-    \label{fig:result/Biogrid/fusion}
+    \label{fig:biogrid_fusion}
 \end{figure}
 
 \begin{table}[h]
@@ -235,12 +235,12 @@ MPNN网络的具体实现如式\ref{equ:MPNNPassing}所示。
 
 依据\ref{section:NodeConv:experience}部分中实验方案（二）中提到的方法，针对Bigrid网络构造了具有四类分类的训练特征子图数据集，基于三种方法生成了待筛选复合物数据集。实验中训练了基于邻边卷积网络的评价模型，并分别对三个待筛选特征子图样本数据集中的样本进行了测试，获取了筛选后样本数据集，最后对比了筛选前后样本数据集F1值和综合评价指标。本章对比了基于图卷积神经网络的复合物筛选模型和基于邻边卷积的蛋白质复合物筛选模型，本章总体的实验结果如下所示。
 
-图\ref{fig:result/Biogrid/fusion}为在Biogrid网络中，基于结点的全局特征模型、基于邻边的生物特征模型以及特征融合模型筛选之后结果的对比，包含了F1值对比图和SPA值对比图。表\ref{tab:result/Biogrid/fusion}为实验结果具体数据。
+图\ref{fig:biogrid_fusion}为在Biogrid网络中，基于结点的全局特征模型、基于邻边的生物特征模型以及特征融合模型筛选之后结果的对比，包含了F1值对比图和SPA值对比图。表\ref{tab:result/Biogrid/fusion}为实验结果具体数据。
 
 \subparagraph*{实验结论} ~
 
-从实验方案（一）从图\ref{fig:result/DIP/fusion}中可以看出，在DIP网络中，MPNN融合模型的F1指标在Dpclus和Clique的数据样本中均得到了最优结果，SPA指标在Clique和IPCA算法中有一定降低，而Dpclus算法中SPA指标达到了最优。
-和实验方案（二）从图\ref{fig:result/Biogrid/fusion}中可以看出，在Clique样本集上，其SPA指标和F1值均达到了最优结果，在Dpclus的样本集中SPA指标也得到了最优结果。
+从实验方案（一）从图\ref{fig:dip_fusion}中可以看出，在DIP网络中，MPNN融合模型的F1指标在Dpclus和Clique的数据样本中均得到了最优结果，SPA指标在Clique和IPCA算法中有一定降低，而Dpclus算法中SPA指标达到了最优。
+和实验方案（二）从图\ref{fig:biogrid_fusion}中可以看出，在Clique样本集上，其SPA指标和F1值均达到了最优结果，在Dpclus的样本集中SPA指标也得到了最优结果。
 
 基于结点和邻边特征融合的复合物筛选模型，对比基于结点特征的图卷积模型和基于邻边特征的邻边卷积模型，其模型更为复杂，筛选的结果中准确率更高。模型在Dpclus和Clique算法中均取得了一定的评价指标效果提升，结果表明了融合特征模型的有效性。
 

@@ -19,16 +19,16 @@
 
 邻边卷积网络\cite{wang_dynamic_2019}（EdgeBase Convolution）由点云学习领域提出，是一种基于邻边做特征转换以及特征聚合的方法。点云学习指的是使用计算机的方法学习与分析空间中独立数据点的集合，数据点的信息包括坐标、颜色、分类、强度值等等信息，数据点在空间中的集合状态即为点云。点云学习的任务是对点云数据做分割、物体识别等等。
 
-在点云任务中，会与待更新结点i周围的K个最近邻居建立连边，基于连边做特征更新，然后所有的连边特征汇聚到一起作为结点的新特征。连边特征更新的过程中会考虑源点与汇点的信息流动，其具体的过程如图\ref{fig:EdgeConv/main}所示。
+在点云任务中，会与待更新结点i周围的K个最近邻居建立连边，基于连边做特征更新，然后所有的连边特征汇聚到一起作为结点的新特征。连边特征更新的过程中会考虑源点与汇点的信息流动，其具体的过程如图\ref{fig:edgeconv_main}所示。
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=14cm]{EdgeConv/main}
+    \includegraphics[width=14cm]{edgeconv_main}
     \caption{基于邻边的图卷积神经网络更新示意图\cite{wang_dynamic_2019}}
-    \label{fig:EdgeConv/main}
+    \label{fig:edgeconv_main}
 \end{figure}
 
 对于结点i的更新，需要从结点i周围的5个邻居建立到结点i的邻边。对于其中某一条邻边$E_{j,i}$，其两个端点分别具有各自的特征，将特征拼接到一起，然后经过邻边卷积的多层感知器计算，即可得到邻边特征更新后的结果$e_{ij}$如图中左侧所示。
-更新结点i周围所有的邻边特征，然后计算其和值，就形成了结点i更新之后的特征，如图\ref{fig:EdgeConv/main}中右侧所示。
+更新结点i周围所有的邻边特征，然后计算其和值，就形成了结点i更新之后的特征，如图\ref{fig:edgeconv_main}中右侧所示。
 
 \section{基于邻边卷积网络的复合物筛选模型}
 \label{section:EdgeConv:detail}
@@ -75,21 +75,21 @@
 \end{equation}
 式中$h_j^{(l+1)}$为第第$l+1$层结点j更新之后的特征数据，$N(j)$表示结点的所有邻居，$\left\lVert N(j)\right\rVert $表示邻边数量，$e_{ij}^{(l)}$表示某一条邻边更新之后的特征。
 
-每一轮基于edgeConv的卷积过程可以图\ref{fig:EdgeConv/edgeconv}所示，结合公式和图片，可以得出基于edgeConv的卷积过程首先是由结点更新邻边特征，如图中上半部分所示，在子图中每一条邻边特征会获取其两个端点（源点和汇点）的特征，第一部分更新为源点至汇点的特征相减并做特征转换，代表邻边的数据流，第二部分为源点特征做特征转换，这两部分特征结合到一起经过激活形成邻边更新的特征。然后是用更新之后的邻边特征聚合物新的结点特征，如图中下半部分所示，结点会汇聚其所有邻边的特征并取平均值，同时依据最大值池化结点会保留一部分自身特征。
+每一轮基于edgeConv的卷积过程可以图\ref{fig:edgeconv_edgeconv}所示，结合公式和图片，可以得出基于edgeConv的卷积过程首先是由结点更新邻边特征，如图中上半部分所示，在子图中每一条邻边特征会获取其两个端点（源点和汇点）的特征，第一部分更新为源点至汇点的特征相减并做特征转换，代表邻边的数据流，第二部分为源点特征做特征转换，这两部分特征结合到一起经过激活形成邻边更新的特征。然后是用更新之后的邻边特征聚合物新的结点特征，如图中下半部分所示，结点会汇聚其所有邻边的特征并取平均值，同时依据最大值池化结点会保留一部分自身特征。
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=10cm]{EdgeConv/edgeconv}
+    \includegraphics[width=10cm]{edgeconv_edgeconv}
     \caption{总体EdgeConv图卷积过程示意图}
-    \label{fig:EdgeConv/edgeconv}
+    \label{fig:edgeconv_edgeconv}
 \end{figure}
 
 \subsection{特征子图评价模型}
 
 本文处理了大量的生物学数据，包括蛋白质功能注释数据、结构域相互作用数据、亚细胞定位数据等，应用相关的生物领域的处理方法将生物学数据转换为可应用的特征数据，最终得到了11维度的特征数据。所有的特征都描述蛋白质相互作用，因此在图结构中，这些特征编码为图结构邻边的特征。
-基于邻边卷积特征的复合物筛选模型总体流程如图\ref{fig:EdgeConv/flow}所示。
+基于邻边卷积特征的复合物筛选模型总体流程如图\ref{fig:edgeconv_flow}所示。
 
-第一阶段如标号1所示，需要将初始的邻边特征以汇聚方法初始化结点特征，如图中上半部分所示。该汇聚方法为初始结点特征由其周围所有邻边特征的平均值替代。其具体的计算过程如公式\ref{equ:EdgetoNodeFeat}所示，其中激活函数为直接映射。其过程可被视为聚合阶段的基于边卷积神经网络过程，如图中\ref{fig:EdgeConv/edgeconv}下半部分所示。
+第一阶段如标号1所示，需要将初始的邻边特征以汇聚方法初始化结点特征，如图中上半部分所示。该汇聚方法为初始结点特征由其周围所有邻边特征的平均值替代。其具体的计算过程如公式\ref{equ:EdgetoNodeFeat}所示，其中激活函数为直接映射。其过程可被视为聚合阶段的基于边卷积神经网络过程，如图中\ref{fig:edgeconv_edgeconv}下半部分所示。
 
 第二阶段如标号2所示，需要基于邻边卷积将特征与拓扑结构融合，基于pool方法得到子图结构的特征表示，并基于子图特征做分类预测以及评分预测。其具体过程如图中下半部分所示。
 
@@ -99,9 +99,9 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=15cm]{EdgeConv/flow}
+    \includegraphics[width=15cm]{edgeconv_flow}
     \caption{基于邻边卷积特征的复合物筛选模型总体流程}
-    \label{fig:EdgeConv/flow}
+    \label{fig:edgeconv_flow}
 \end{figure}
 
 \subsection{筛选模型算法}
@@ -169,13 +169,13 @@
 
 \begin{figure}[htbp]
     \centering
-    \subcaptionbox{F1值对比}{\label{fig:result/DIP/F1/edge}
-        \includegraphics[width=10cm]{result/DIP/F1/edge}}
+    \subcaptionbox{F1值对比}{\label{fig:dip_f1_edge}
+        \includegraphics[width=10cm]{dip_f1_edge}}
     \vskip0.2cm
-    \subcaptionbox{SPA值对比}{\label{fig:result/DIP/SPA/edge}
-        \includegraphics[width=10cm]{result/DIP/SPA/edge}}
+    \subcaptionbox{SPA值对比}{\label{fig:dip_spa_edge}
+        \includegraphics[width=10cm]{dip_spa_edge}}
     \caption{DIP网络不同模型处理后结果对比}
-    \label{fig:result/DIP/edge}
+    \label{fig:dip_edge}
 \end{figure}
 
 \begin{table}[h]
@@ -206,7 +206,7 @@
 
 按照以上的实验方法本章对比了基于随机邻边特征的邻边卷积模型，随机邻边特征模型的对比可以确定嵌入的邻边相似性特征的有效性，本章总体的实验结果如下所示。
 
-图\ref{fig:result/DIP/edge}为在DIP网络中，随机特征模型和基于生物特征的模型筛选之后结果的对比，包含了F1值对比图和SPA值对比图。表\ref{tab:result/DIP/edge}为实验结果具体数据。
+图\ref{fig:dip_edge}为在DIP网络中，随机特征模型和基于生物特征的模型筛选之后结果的对比，包含了F1值对比图和SPA值对比图。表\ref{tab:result/DIP/edge}为实验结果具体数据。
 
 
 \subparagraph*{实验方案（二）} 稠密网络中基于邻边卷积筛选模型实验
@@ -216,13 +216,13 @@
 
 \begin{figure}[htbp]
     \centering
-    \subcaptionbox{F1值对比}{\label{fig:result/Biogrid/F1/edge}
-        \includegraphics[width=10cm]{result/Biogrid/F1/edge}}
+    \subcaptionbox{F1值对比}{\label{fig:biogrid_f1_edge}
+        \includegraphics[width=10cm]{biogrid_f1_edge}}
     \vskip0.2cm
-    \subcaptionbox{SPA值对比}{\label{fig:result/Biogrid/SPA/edge}
-        \includegraphics[width=10cm]{result/Biogrid/SPA/edge}}
+    \subcaptionbox{SPA值对比}{\label{fig:biogrid_spa_edge}
+        \includegraphics[width=10cm]{biogrid_spa_edge}}
     \caption{Biogrid网络不同模型处理后结果对比}
-    \label{fig:result/Biogrid/edge}
+    \label{fig:biogrid_edge}
 \end{figure}
 
 \begin{table}[h]
@@ -253,12 +253,12 @@
 依据\ref{section:NodeConv:experience}部分中实验方案（二）中提到的方法，针对Bigrid网络构造了具有四类分类的训练特征子图数据集，基于三种方法生成了待筛选复合物数据集。实验中训练了基于邻边卷积网络的评价模型，并分别对三个待筛选特征子图样本数据集中的样本进行了测试，获取了筛选后样本数据集，最后对比了筛选前后样本数据集F1值和综合评价指标。
 
 按照以上的实验方法本章对比了基于随机邻边特征的邻边卷积模型，随机邻边特征模型的对比可以确定嵌入的邻边相似性特征的有效性，本章总体的实验结果如下所示。
-图\ref{fig:result/Biogrid/edge}为在Biogrid网络中，随机特征模型和基于生物特征的模型筛选之后结果的对比，包含了F1值对比图和SPA值对比图。表\ref{tab:result/Biogrid/edge}为实验结果具体数据。
+图\ref{fig:biogrid_edge}为在Biogrid网络中，随机特征模型和基于生物特征的模型筛选之后结果的对比，包含了F1值对比图和SPA值对比图。表\ref{tab:result/Biogrid/edge}为实验结果具体数据。
 
 \subparagraph*{实验结论} ~
 
 从实验方案（一）从图中可以看出，添加了生物特征后，在DIP网络中复合物的生成质量得到了相应的提升，同样的由于CLique算法的特性，该算法的前后对比提升幅度最为明显。
-和实验方案（二）从图\ref{fig:result/Biogrid/edge}中可以看出添加了生物特征后，Biogrid网络相应样本的F1值均有较为明显的提升，而Clique算法的样本提升最为明显。综合评价指标SPA值也具有一定的提升。
+和实验方案（二）从图\ref{fig:biogrid_edge}中可以看出添加了生物特征后，Biogrid网络相应样本的F1值均有较为明显的提升，而Clique算法的样本提升最为明显。综合评价指标SPA值也具有一定的提升。
 
 基于相似性数据邻边嵌入的复合物筛选模型，对比无相似性嵌入模型取得较高的F1值和SPA值提升，稠密网络具有更多的邻边信息，在稠密网络中其提升幅度更为明显，最高的F1值提升在Biogrid的Clique算法中，从0.203提升至0.510。
 

@@ -34,14 +34,14 @@ Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并
 \begin{figure}[htbp]
     \centering
     \subcaptionbox{DIP数据集}{\label{fig:ppi:zitu:a}
-        \includegraphics[width=5cm]{PPI/DIP.png}}
+        \includegraphics[width=5cm]{ppi_DIP.png}}
     \subcaptionbox{Krogan数据集}{\label{fig:ppi:zitu:b}
-        \includegraphics[width=5cm]{PPI/Krogan.png}}
+        \includegraphics[width=5cm]{ppi_Krogan.png}}
     \vskip0.5cm
     \subcaptionbox{Biogrid数据集}{\label{fig:ppi:zitu:c}
-        \includegraphics[width=5cm]{PPI/Biogrid.png}}
+        \includegraphics[width=5cm]{ppi_Biogrid.png}}
     \subcaptionbox{Gavin数据集}{\label{fig:ppi:zitu:d}
-        \includegraphics[width=5cm]{PPI/Gavin.png}}
+        \includegraphics[width=5cm]{ppi_Gavin.png}}
     \caption{蛋白质相互作用数据集}
     \label{fig:ppi-datasets}
 \end{figure}
@@ -119,13 +119,13 @@ Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并
 \end{equation}
 其中$\hat{A}\in \mathbb{R}^{n\times n} $为经过拉普拉斯平滑的邻接矩阵；$H^{(l)}\in \mathbb{R}^{n\times m} $代表第l层的结点特征矩阵，其中每一个结点特征维度为m；$W^{(l)}\in \mathbb{R}^{m\times m} $代表卷积核，代表每一个结点的特征转换；$\sigma $为激活函数；$H^{(l+1)}\in \mathbb{R}^{n\times m} $代表经过一轮卷积之后的输出结果。
 
-类似于传统的卷积方式，GCN也可以多层卷积组合到一起进行，如图\ref{fig:GCN/main}所示。图卷积的输入为邻接矩阵代表的图结构和特征矩阵代表的结点特征，隐层之间采用Relu的激活函数，最后得到图的结点特征。
+类似于传统的卷积方式，GCN也可以多层卷积组合到一起进行，如图\ref{fig:gcn_main}所示。图卷积的输入为邻接矩阵代表的图结构和特征矩阵代表的结点特征，隐层之间采用Relu的激活函数，最后得到图的结点特征。
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=14cm]{GCN/main}
+    \includegraphics[width=14cm]{gcn_main}
     \caption{GCN示意图\cite{wu_comprehensive_2020}}
-    \label{fig:GCN/main}
+    \label{fig:gcn_main}
 \end{figure}
 
 \subparagraph{2)~自编码器} ~
@@ -134,12 +134,12 @@ Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=9cm]{gae/autoencoder}
+    \includegraphics[width=9cm]{gae_autoencoder}
     \caption{自编码器示意图}
-    \label{fig:gae/autoencoder}
+    \label{fig:gae_autoencoder}
 \end{figure}
 
-图\ref{fig:gae/autoencoder}为经典的图片自编码器示意图，输入图像为$X$，中间编码为$h$，输出图像为$X^\prime $，输入输出差距为$\varDelta X$，编码器的函数过程可以用$F$表示，解码器过的函数过程可以用$G$表示。总体过程可以如式\ref{equ:autoencoder}所示。通过反向传播不断的减小$\varDelta X$，最终隐层编码表示即可学习到输入图像的特征。
+图\ref{fig:gae_autoencoder}为经典的图片自编码器示意图，输入图像为$X$，中间编码为$h$，输出图像为$X^\prime $，输入输出差距为$\varDelta X$，编码器的函数过程可以用$F$表示，解码器过的函数过程可以用$G$表示。总体过程可以如式\ref{equ:autoencoder}所示。通过反向传播不断的减小$\varDelta X$，最终隐层编码表示即可学习到输入图像的特征。
 \begin{equation}
     \label{equ:autoencoder}
     X^\prime =G(F(X)),
@@ -148,15 +148,15 @@ Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并
 
 \subparagraph{3)~图自编码器} ~
 
-图自编码器是结合了图卷积神经网络和自编码器的一种用于处理图结构数据的深度神经网络。其具体过程如图\ref{fig:gae/main}表示，其目标是对图结构进行编码，得到结点的特征表示。
+图自编码器是结合了图卷积神经网络和自编码器的一种用于处理图结构数据的深度神经网络。其具体过程如图\ref{fig:gae_main}表示，其目标是对图结构进行编码，得到结点的特征表示。
 
 相较于普通的自编码器，图自编码器的输入为图的邻接矩阵$A$和图的特征矩阵$H$，编码过程是多层的图卷积神经网络，解码过程是用编码之后的结点特征做基于相似性计算的链路预测，最终对比经过链路预测得到的邻接矩阵$A^{\prime}$和输入的邻接矩阵$A$的差异。
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=14cm]{gae/main}
+    \includegraphics[width=14cm]{gae_main}
     \caption{GAE示意图\cite{wu_comprehensive_2020}}
-    \label{fig:gae/main}
+    \label{fig:gae_main}
 \end{figure}
 
 
@@ -172,9 +172,9 @@ Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=15cm]{gae/mygae}
+    \includegraphics[width=15cm]{gae_mygae}
     \caption{基于图自编码器的蛋白质互作网络结点嵌入模型}
-    \label{fig:gae/mygae}
+    \label{fig:gae_mygae}
 \end{figure}
 
 解码过程采用了基于神经网络的链路预测模型，对于图中的每一条可能的邻边，基于邻边两个端点的特征组合到一起，经过两层神经网络，再经过Softmax激活函数得到一个0至1的数值，代表该条邻边存在的可能性，具体过程如式\ref{equ:decoder}所示。
@@ -239,15 +239,15 @@ Gavin数据集基于亲和纯化与质谱技术检测蛋白质相互作用，并
 
 Deepwalk是基于随机游走的图结点嵌入模型\cite{perozzi_deepwalk_2014}，基本思想是通过在图中随机游走的方式获取若干结点的序列，这些序列被当作具有上下文语言的语句，而结点被当作语句中的一个单词。通过Word2Vec的模型，将语句中的单词转换为向量，作为结点的特征，即可得到结点特性嵌入。在图中游走获取的结点序列能够在一定程序上包含结点周围的拓扑信息，若干周围信息组合到一起则可以提取出整个图结构的拓扑信息。通过序列获取结点嵌入后使结点依旧保持图结构的拓扑信息。
 
-RandomWalk是一种可重复访问已访问节点的深度优先遍历算法。给定当前访问起始节点，从其邻居中随机采样节点作为下一个访问节点，重复此过程，直到访问序列长度满足预设条件。该采样过程得到的序列如图\ref{fig:deepwalk/main}中的b部分所示。
+RandomWalk是一种可重复访问已访问节点的深度优先遍历算法。给定当前访问起始节点，从其邻居中随机采样节点作为下一个访问节点，重复此过程，直到访问序列长度满足预设条件。该采样过程得到的序列如图\ref{fig:deepwalk_main}中的b部分所示。
 
-Skip-gram是一种词向量嵌入模型，基本思路是利用序列中的单个词预测周围词的模型，在学习了所有序列之后，可以得到每一个结点的特征嵌入。利用Skip-gram模型获取结点的嵌入过程如图\ref{fig:deepwalk/main}中的c部分所示。
+Skip-gram是一种词向量嵌入模型，基本思路是利用序列中的单个词预测周围词的模型，在学习了所有序列之后，可以得到每一个结点的特征嵌入。利用Skip-gram模型获取结点的嵌入过程如图\ref{fig:deepwalk_main}中的c部分所示。
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=10cm]{deepwalk/main}
+    \includegraphics[width=10cm]{deepwalk_main}
     \caption{deepwalk嵌入示意图示意图}
-    \label{fig:deepwalk/main}
+    \label{fig:deepwalk_main}
 \end{figure}
 
 考虑到$PIN$的规模，本文的Deepwalk嵌入模型的序列长度为100，基于每一个结点均随机游走采用10跳序列，最终的序列数据为$10n*100$，n为不同的$PIN$的结点数。最终获取的Deepwalk嵌入特征维度为64维。
@@ -282,14 +282,14 @@ Skip-gram是一种词向量嵌入模型，基本思路是利用序列中的单�
 \subsection{基于多种相似性计算方法的邻边特征嵌入}
 \label{subsection:featPPINetwork:edgeFeatConstruct}
 
-除了蛋白质的结点特征，蛋白质之间也存在复杂的相互所有关系，不同的相互作用关系由于作用的蛋白质结构域不同、功能不同、发生作用的生理位置不同等，具有很大的差异性。在一般的方法中，这部分差异性仅仅映射在作用强度一个单一的数值中，在本文中，将这种丰富的作用差异作为邻边的特征完整的嵌入到图结构中，如图\ref{fig:edgefeat/main}所示。
+除了蛋白质的结点特征，蛋白质之间也存在复杂的相互所有关系，不同的相互作用关系由于作用的蛋白质结构域不同、功能不同、发生作用的生理位置不同等，具有很大的差异性。在一般的方法中，这部分差异性仅仅映射在作用强度一个单一的数值中，在本文中，将这种丰富的作用差异作为邻边的特征完整的嵌入到图结构中，如图\ref{fig:edgefeat_main}所示。
 
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=10cm]{edgefeat/main}
+    \includegraphics[width=10cm]{edgefeat_main}
     \caption{edgefeat嵌入示意图}
-    \label{fig:edgefeat/main}
+    \label{fig:edgefeat_main}
 \end{figure}
 本文为蛋白质相互作用网络的所有邻边嵌入相同维度的特征，特征中相同标号的数据具有同样的生物学意义。本文为邻边嵌入的特征包括基于蛋白质GO功能注释相似性的特征、基于蛋白质拓扑域相似性特征、基于蛋白质亚细胞定位相似性的特征和基于拓扑相似性的特征。下面分别介绍这四类相似性特征。
 
